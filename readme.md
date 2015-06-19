@@ -18,7 +18,7 @@ Your app must use/have all of the following:
 ## ADDITIONAL CHALLENGES
 Consider implementing some of the following with your app:
 
-* **Styleing with a CSS Framework.** Use either Twitter Bootstrap or Semantic UI to make your site look great.
+* **Styling with a CSS Framework.** Use either Twitter Bootstrap or Semantic UI to make your site look great.
 * **Web Sockets** - Use [Socket.io](http://socket.io/) to have real time behavior in your app
 * **Web Scraping.** Check out [Phantom.js](http://casperjs.org/) and [Casper.js](http://casperjs.org/).
 * **OAuth** - Use [passport.js](http://passportjs.org/) for authentication using external providers (Facebook, Twitter, Github etc.)
