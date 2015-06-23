@@ -5,3 +5,16 @@ on the bottom
 so everything else loads in case my js file breaks
 
 and take it OUT of the header altogether
+
+tracks:
+
+Hot Fuss, The Killers - track # 0eGsygTp906u18L0Oimnem
+https://api.spotify.com/v1/tracks/0eGsygTp906u18L0Oimnem
+
+The Element Of Freedom, Alicia Keys - spotify:track:5sra5UY6sD658OabHL3QtI
+
+Girl on Fire, Alicia Keys - spotify:track:6qOEjO2IUD7PjtpsXawq0d
+
+22, Taylor Swift - spotify:track:5ybJm6GczjQOgTqmJ0BomP
+
+["0eGsygTp906u18L0Oimnem", "5sra5UY6sD658OabHL3QtI", "6qOEjO2IUD7PjtpsXawq0d", "5ybJm6GczjQOgTqmJ0BomP"]

@@ -1,11 +1,26 @@
 <!-- Play game! page to show/hide songs, play music, accept guesses -->
 <% include ../partials/header %>
 
-<p>Play game!!!!</p>
+<h1>Play game!!!!</h1>
 
+<div>
+	<form>
+		<input type="submit" id="startGameForm" value="start" class="button">
+	</form>
+</div>
 
+<div>
+	<audio id="audioPreviewUrl" src="https://p.scdn.co/mp3-preview/19953ea54f50827fb8ff02c0d14b1b65f37d15b3" alt="Alicia Keys New York Preview" controls autoplay>Alicia Keys New York Preview</audio>
+	<!-- remove `controls` attribute later -->
+</div>
 
+<div>
+	<p>show artist info here</p>
+</div>
 
+<div>
+	<p>show score info here</p>
+</div>
 
 
 <!-- bring in custom js scripts for this page -->

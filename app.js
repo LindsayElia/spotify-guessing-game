@@ -8,6 +8,7 @@ var session = require("cookie-session");
 var morgan = require("morgan");
 // var loginMiddleware = require("./middleware/loginHelper");
 // var routeMiddleware = require("./middleware/routeHelper");
+var favicon = require("serve-favicon");
 
 // not sure this is the correct format for bringing in dotenv ?
 // require('dotenv').load();
@@ -16,6 +17,7 @@ app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
 app.use(express.static(__dirname + "/public"));
+app.use(favicon(__dirname + "/public/favicon.ico"));
 app.use(bodyParser.urlencoded({extended:true}));
 // app.use(loginMiddleware);
 
@@ -66,28 +68,28 @@ app.get("/signup", function(req, res){
 // create a new user and redirect to "/edit" for user to enter their player bio info
 app.post("/signup", function(req, res){
 	// do stuff
-	res.redirect("/users/edit");
+	res.redirect("/users/:user_id/edit");
 });
 
 //_______USER ROUTES_______
 
 // SHOW - GET "show"
 // show user's bio, friends, and playlists
-app.get("users/:user_id/show", function(req, res){
+app.get("/users/:user_id", function(req, res){
 	res.render("users/show");
 });
 
 // EDIT - GET "edit"
 // show form to edit user's bio
-app.get("users/:user_id/edit", function(req, res){
+app.get("/users/:user_id/edit", function(req, res){
 	res.render("users/edit");
 });
 
 // SHOW - POST "show"
 // post updated/edited bio info & redirect to the users/show page
-app.post("users/:user_id/show", function(req, res){
+app.post("/users/:user_id", function(req, res){
 	// do stuff
-	res.redirect("/users/show");
+	res.redirect("/users/:user_id");
 });
 
 //_______PLAYLISTS ROUTES_______
@@ -100,15 +102,15 @@ app.get("/playlists/new", function(req, res){
 
 // EDIT - GET "edit"
 // edit an existing playlist
-app.get("/playlists/:playlist_id/edit", function(req, res){
+app.get("/playlists/:playlist_id", function(req, res){
 	res.render("playlists/edit");
 });
 
 // SHOW - POST to users/show
-// post updated/edited playlist info & redirect to the users/show page
-app.post("playlists/:playlist_id/show", function(req, res){
+// post updated/edited playlist info & redirect to the user's show page
+app.post("playlists/:playlist_id", function(req, res){
 	// do stuff
-	res.redirect("/users/show");
+	res.redirect("/users/:user_id");
 });
 
 //_______ROUNDS ROUTES_______
