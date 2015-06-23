@@ -9,14 +9,15 @@ var morgan = require("morgan");
 // var loginMiddleware = require("./middleware/loginHelper");
 // var routeMiddleware = require("./middleware/routeHelper");
 
-require('dotenv').load();
+// not sure this is the correct format for bringing in dotenv ?
+// require('dotenv').load();
 
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(loginMiddleware);
+// app.use(loginMiddleware);
 
 // app.use(session({
 // 	maxAge: ,	//number
@@ -24,3 +25,29 @@ app.use(loginMiddleware);
 // 	name: "" 	//string
 // }));
 
+//_______ ROUTES - USER??? _______
+
+// ROOT
+app.get("/", function(req, res){
+	res.redirect("/index");
+});
+
+// INDEX
+app.get("/index", function(req, res){
+	res.render("users/index");
+});
+
+// 
+
+
+// 404 page
+app.get("*", function(req, res){
+	res.render("errors/404");
+});
+
+
+//_______START SERVER_______
+// remote port or localhost
+app.listen(process.env.PORT || 3000, function(){
+	console.log("Server is starting on port 3000");
+});
