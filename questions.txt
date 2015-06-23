@@ -1,0 +1,7 @@
+Tim - if only one page is using a .js file, is it better to create a separate header partial for that page, so all of the other pages don't have to load that .js file when they won't be using it?
+
+put it inside of that single page that is using it,
+on the bottom
+so everything else loads in case my js file breaks
+
+and take it OUT of the header altogether
