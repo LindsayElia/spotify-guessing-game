@@ -25,7 +25,9 @@ app.use(bodyParser.urlencoded({extended:true}));
 // 	name: "" 	//string
 // }));
 
-//_______ ROUTES -- USERS _______
+//______________ROUTES______________
+
+//_______HOME_______
 
 // ROOT
 app.get("/", function(req, res){
@@ -37,35 +39,56 @@ app.get("/index", function(req, res){
 	res.render("users/index");
 });
 
+//_______LOGIN_______
+
 // LOGIN - GET "login"
 // show the login page
-
+app.get("/login", function(req, res){
+	res.render("users/login");
+});
 
 // LOGIN - POST "login"
-// sign the user in and redirect to page showing all players "users/index"
+// sign the user in and redirect to page showing all players "/index"
+app.post("/login", function(req, res){
+	// do stuff
+	res.redirect("/index");
+});
 
-
+//_______SIGNUP_______
 
 // SIGNUP - GET "signup"
 // show the signup page
-
+app.get("/signup", function(req, res){
+	res.render("users/signup");
+});
 
 // SIGNUP - POST "signup"
-// create a new user and redirect to "users/edit" for user to enter their player bio info
+// create a new user and redirect to "/edit" for user to enter their player bio info
+app.post("/signup", function(req, res){
+	// do stuff
+	res.redirect("/edit");
+});
 
-
+//_______USER ROUTES_______
 
 // SHOW - GET "show"
 // show user's bio
-
+app.get("/show", function(req, res){
+	res.render("users/show");
+});
 
 // EDIT - GET "edit"
 // show form to edit user's bio
-
+app.get("/edit", function(req, res){
+	res.render("users/edit");
+});
 
 // SHOW - POST "show"
-// post updated/edited bio info back to the show page
-
+// post updated/edited bio info & redirect to the show page
+app.post("/show", function(req, res){
+	// do stuff
+	res.redirect("/show");
+});
 
 
 
@@ -77,8 +100,7 @@ app.get("*", function(req, res){
 	res.render("errors/404");
 });
 
-
-//_______START SERVER_______
+// _______START SERVER_______
 // remote port or localhost
 app.listen(process.env.PORT || 3000, function(){
 	console.log("Server is starting on port 3000");
