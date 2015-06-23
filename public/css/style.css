@@ -1,4 +1,8 @@
 body {
 	font-family: sans-serif;
-	background-color: blue;
+	background-color: azure;
+}
+
+p { 
+	border: 1px solid black;
 }
