@@ -66,33 +66,57 @@ app.get("/signup", function(req, res){
 // create a new user and redirect to "/edit" for user to enter their player bio info
 app.post("/signup", function(req, res){
 	// do stuff
-	res.redirect("/edit");
+	res.redirect("/users/edit");
 });
 
 //_______USER ROUTES_______
 
 // SHOW - GET "show"
-// show user's bio
-app.get("/show", function(req, res){
+// show user's bio, friends, and playlists
+app.get("users/:user_id/show", function(req, res){
 	res.render("users/show");
 });
 
 // EDIT - GET "edit"
 // show form to edit user's bio
-app.get("/edit", function(req, res){
+app.get("users/:user_id/edit", function(req, res){
 	res.render("users/edit");
 });
 
 // SHOW - POST "show"
-// post updated/edited bio info & redirect to the show page
-app.post("/show", function(req, res){
+// post updated/edited bio info & redirect to the users/show page
+app.post("users/:user_id/show", function(req, res){
 	// do stuff
-	res.redirect("/show");
+	res.redirect("/users/show");
 });
 
+//_______PLAYLISTS ROUTES_______
 
+// NEW - GET "new"
+// search songs to add to playlist
+app.get("/playlists/new", function(req, res){
+	res.render("playlists/new");
+});
 
+// EDIT - GET "edit"
+// edit an existing playlist
+app.get("/playlists/:playlist_id/edit", function(req, res){
+	res.render("playlists/edit");
+});
 
+// SHOW - POST to users/show
+// post updated/edited playlist info & redirect to the users/show page
+app.post("playlists/:playlist_id/show", function(req, res){
+	// do stuff
+	res.redirect("/users/show");
+});
+
+//_______ROUNDS ROUTES_______
+
+// PLAY - GET "play"
+app.get("/play", function(req, res){
+	res.render("rounds/play");
+});
 
 
 // 404 page - oopsie
