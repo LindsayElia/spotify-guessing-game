@@ -25,22 +25,54 @@ app.use(bodyParser.urlencoded({extended:true}));
 // 	name: "" 	//string
 // }));
 
-//_______ ROUTES - USER??? _______
+//_______ ROUTES -- USERS _______
 
 // ROOT
 app.get("/", function(req, res){
 	res.redirect("/index");
 });
 
-// INDEX
+// INDEX - show "index"
 app.get("/index", function(req, res){
 	res.render("users/index");
 });
 
-// 
+// LOGIN - GET "login"
+// show the login page
 
 
-// 404 page
+// LOGIN - POST "login"
+// sign the user in and redirect to page showing all players "users/index"
+
+
+
+// SIGNUP - GET "signup"
+// show the signup page
+
+
+// SIGNUP - POST "signup"
+// create a new user and redirect to "users/edit" for user to enter their player bio info
+
+
+
+// SHOW - GET "show"
+// show user's bio
+
+
+// EDIT - GET "edit"
+// show form to edit user's bio
+
+
+// SHOW - POST "show"
+// post updated/edited bio info back to the show page
+
+
+
+
+
+
+
+// 404 page - oopsie
 app.get("*", function(req, res){
 	res.render("errors/404");
 });
