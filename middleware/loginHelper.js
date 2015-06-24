@@ -3,7 +3,7 @@ var db = require("../models");
 var loginHelpers = function(req, res, next){
 
 	req.login = function(user){
-		req.session.id = user._id;
+		req.session.id = user._id;	// is ._id the same as .id ?
 	};
 
 	req.logout = function(){
