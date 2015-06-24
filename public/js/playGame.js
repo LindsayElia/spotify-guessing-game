@@ -30,6 +30,8 @@ $(function() {
 	var scoreIncorrect = 0;
 	var $numCorrect = $("#numCorrect");
 	var $numIncorrect = $("#numIncorrect");
+	var $countdownTimer = $("#countdownTimer");
+
 
 
 	// hide parts of the page on inital page load
@@ -76,9 +78,33 @@ $(function() {
 			// hide the start button, show the guess form, hide the results from previous answer
 			$startGameForm.hide();
 			$divUserInputGuess.show();
-			$countdown.show();
 			$divSongResults.hide();
 			$divScore.hide();
+
+			// count down the timer from 30 seconds
+			// all previews are 30 seconds according to Spotify API documentation
+			$countdown.show();
+
+			var i = 30;
+			function countdown(){
+				if (i === 0){
+					console.log("time is up");
+					return;
+				}
+				else {
+				//	setTimeout(countdown, 1000);
+					console.log(i)
+					i--;
+				}
+			}
+			
+			setInterval(countdown, 1000);
+			
+			$countdownTimer.html("some num");
+
+			// TO DO...
+			// if I build my own - remove flipclock from package.json
+
 		})
 		.fail(function(){
 			console.log("error with ajax request to Spotify API");
