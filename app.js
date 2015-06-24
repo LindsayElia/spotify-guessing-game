@@ -26,7 +26,7 @@ app.use(loginMiddleware);
 // configure & use cookie-session module
 app.use(session({
 	maxAge: 7200000,	// 2 hours, in milliseconds
-	secret: "music-lovers-key",
+	secret: "music-lovers-key",		// is this the key used to make the hash?
 	name: "spotify-game-with-friends"	// name for cookie
 }));
 
@@ -44,6 +44,38 @@ app.get("/index", function(req, res){
 	res.render("users/index");
 });
 
+//_______SIGNUP_______
+
+// SIGNUP - GET "signup"
+// show the signup page
+app.get("/signup", function(req, res){
+	res.render("users/signup");
+});
+
+// SIGNUP - POST "signup"
+// create a new user and redirect to "/edit" for user to enter their player bio info
+app.post("/signup", function(req, res){
+	var newUser = {};
+	newUser.email = req.body.userEmail;
+	newUser.password = req.body.userPass;
+	console.log(newUser);		// this displays password in terminal...ok or no?
+
+	db.User.create(newUser, function(err, user){
+		if(user){
+			console.log(user);
+			req.login(user); // set the session id for this user to be the user's id from our DB
+			
+			// do I need to get the user.id first?
+
+			res.redirect("/users/:user_id/edit");
+		} else {
+			console.log(err);
+			//res.redirect("/signup");  // using redirect instead of render because render creates a post request when we don't want one
+			res.render("errors/404");
+		}
+	})
+});
+
 //_______LOGIN_______
 
 // LOGIN - GET "login"
@@ -57,21 +89,6 @@ app.get("/login", function(req, res){
 app.post("/login", function(req, res){
 	// do stuff
 	res.redirect("/index");
-});
-
-//_______SIGNUP_______
-
-// SIGNUP - GET "signup"
-// show the signup page
-app.get("/signup", function(req, res){
-	res.render("users/signup");
-});
-
-// SIGNUP - POST "signup"
-// create a new user and redirect to "/edit" for user to enter their player bio info
-app.post("/signup", function(req, res){
-	// do stuff
-	res.redirect("/users/:user_id/edit");
 });
 
 //_______USER ROUTES_______

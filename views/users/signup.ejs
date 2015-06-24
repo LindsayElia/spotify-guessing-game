@@ -1,7 +1,23 @@
 <!-- sign up page for new, non-logged-in users -->
 <% include ../partials/header %>
 
-<p>Sign up page</p>
-<p>Link to login page for existing users here by mistake</p>
+<h1>Sign up page</h1>
+
+<form action="/signup" method="POST">
+	<p>
+		<label for="userEmail">Email: </label>
+		<input type="text" id="userEmail" name="userEmail" placeholder="Enter email" class="textField" autofocus>
+	</p>
+	<p>
+		<label for="userPass">Password: </label>
+		<input type="text" id="userPass" name="userPass" placeholder="Enter password" class="textField">
+	</p>
+	<input type="submit" value="Create Account" class="button">
+
+</form>
+
+<p>Already have an account? <a href="/login"><button class="button">Login</button></a></p>
+
+<p><a href="/index">Back to high scores</a></p>
 
 <% include ../partials/footer %>
