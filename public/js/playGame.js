@@ -28,6 +28,8 @@ $(function() {
 	var $userInputGuess = $("#userInputGuess");
 	var scoreCorrect = 0;
 	var scoreIncorrect = 0;
+	var $numCorrect = $("#numCorrect");
+	var $numIncorrect = $("#numIncorrect");
 
 
 	// hide parts of the page on inital page load
@@ -135,18 +137,20 @@ $(function() {
 		if (guessLowerCased <=1){
 			console.log("answer is incorrect");
 			scoreIncorrect = scoreIncorrect + 1;
-			
+			$numIncorrect.html("Incorrect: " + scoreIncorrect);
 		} 
 		// if answer includes guess, return correct answer
 		// using .includes() here which is "experimental" according to MDN but seems to work!
 		else if (answer.includes(guessLowerCased)){
 			console.log("answer is correct!!");
 			scoreCorrect = scoreCorrect + 1;
+			$numCorrect.html("Correct: " + scoreCorrect);
 		} 
 		// otherwise, return wrong answer
 		else {
 			console.log("answer is incorrect");
 			scoreIncorrect = scoreIncorrect + 1;
+			$numIncorrect.html("Incorrect: " + scoreIncorrect);
 		}
 
 		
