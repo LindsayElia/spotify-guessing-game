@@ -27,4 +27,5 @@ ul {
 #leftContainer, #rightContainer {
 	float: left;
 	padding: 3%;
+	width: 44%;
 }
