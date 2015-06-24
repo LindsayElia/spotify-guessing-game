@@ -8,7 +8,9 @@ $(function() {
 						"5sra5UY6sD658OabHL3QtI", 
 						"6qOEjO2IUD7PjtpsXawq0d",
 						"5ybJm6GczjQOgTqmJ0BomP", // this one doesn't play anything because the previewUrl is "null"
-						"1BeY7Qw9d77wXOqABHpffT"];
+						"1BeY7Qw9d77wXOqABHpffT",
+						"4I3YxhCTk88ClnlBbtDaK0",
+						"7DUoFVzdG9bQ2kOmdRjCj9"];
 
 	// global variables
 	var currentSong;
@@ -22,6 +24,7 @@ $(function() {
 	var $divScore = $("#divScore");
 	var $pSongResults = $("#pSongResults");
 	var dataSpotify;
+	var $userInputGuess = $("#userInputGuess");
 
 	// hide parts of the page on inital page load
 	$divUserInputGuess.hide();
@@ -84,23 +87,41 @@ $(function() {
 		$pSongResults.html("<li><img src='" + dataSpotify.album.images[1].url + 
 							"' height='" + dataSpotify.album.images[1].height + 
 							"' width='" + dataSpotify.album.images[1].width + "'></li>" +
-							"<li>Artist: " + dataSpotify.name + "</li>" + 
-							"<li>Song title: " + dataSpotify.album.name + "</li>" +
-							"<li>Album: " + dataSpotify.artists[0].name + "</li>");
+							"<li>Artist: " + dataSpotify.artists[0].name + "</li>" + 
+							"<li>Song title: " + dataSpotify.name + "</li>" +
+							"<li>Album: " + dataSpotify.album.name + "</li>");
 
 		// stop music from playing
 		$audioPreviewUrl[0].pause();
 
-		// hide the guess button, show the results form & score info
+		// hide the guess button, show the song results
 		$divUserInputGuess.hide();
 		$divSongResults.show();
 		$startButton.val("Play again");
 		$startGameForm.show();
+		
+		// check user's guess against song results
+		var guessAsIs = $userInputGuess.val();
+		var guessLowerCased = guessAsIs.toLowerCase();
+		console.log(guessLowerCased);
+
+		var answerArtist = dataSpotify.name;
+		var answerSong = dataSpotify.album.name;
+		var answer = answerArtist.toLowerCase() + " " + answerSong.toLowerCase();
+		console.log(answer);
+
+		var regExp = new RegExp("ab+c");
+		
+
+
+		// update user's score
+
+		// display score
 		$divScore.show();
 
 	});
 
-	// show/hide song info
+
 
 
 	// store data about song & user's score in our database(s)
