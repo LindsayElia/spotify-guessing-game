@@ -4,9 +4,9 @@
 <h1>Play game!!!!</h1>
 
 <!-- start button -->
-<div>
-	<form>
-		<input type="submit" id="startGameForm" value="start" class="button">
+<div id="divStartGame">
+	<form id="startGameForm" action="/othertest">
+		<input type="submit" value="start" class="button">
 	</form>
 </div>
 
@@ -16,22 +16,25 @@
 </div>
 
 <!-- user guess input form -->
-<div>
-	<form>
-		<label for="userInputGuess">Guess: </label>
-		<input type="text" name="userInputGuess" id="userInputGuess" placeholder="??????">
-
-		<input type="submit" id="inputGuessForm" value="Guess" class="button">
+<div id="divUserInputGuess">
+	<form id="inputGuessForm" action="/test">
+		<div>
+			<label for="userInputGuess">Guess the song name or artist: </label>
+			<input type="text" name="userInputGuess" placeholder="??????" class="textField">
+		</div>
+		<div>
+			<input type="submit" value="Guess" class="button">
+		</div>
 	</form>
 </div>
 
 <!-- song results -->
-<div>
-	<p>show artist info here</p>
+<div id="divSongResults">
+	<ul id="pSongResults"></ul>
 </div>
 
 <!-- score -->
-<div>
+<div id="divScore">
 	<p>show score info here</p>
 </div>
 

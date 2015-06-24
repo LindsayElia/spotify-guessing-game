@@ -15,3 +15,11 @@ p {
 	background-color: seashell;
 	border-radius: 8px;
 }
+
+.textField {
+	font-size: 1em;
+}
+
+ul {
+	list-style: none;
+}
