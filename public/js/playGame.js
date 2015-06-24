@@ -31,7 +31,7 @@ $(function() {
 	var $numCorrect = $("#numCorrect");
 	var $numIncorrect = $("#numIncorrect");
 	var $countdownTimer = $("#countdownTimer");
-
+	var $countdownTimerHeader = $("#countdownTimerHeader");
 
 
 	// hide parts of the page on inital page load
@@ -85,25 +85,28 @@ $(function() {
 			// all previews are 30 seconds according to Spotify API documentation
 			$countdown.show();
 
-			var i = 30;
+			var timeLeft = 5;
 			function countdown(){
-				if (i === 0){
+				if (timeLeft === 0){
+					$countdownTimerHeader.html("");
+					$countdownTimer.html("time is up");
 					console.log("time is up");
-					return;
+					clearInterval(someIntervalId);
 				}
 				else {
 				//	setTimeout(countdown, 1000);
-					console.log(i)
-					i--;
+					$countdownTimer.html(timeLeft);
+					console.log(timeLeft)
+					timeLeft--;
 				}
 			}
 			
-			setInterval(countdown, 1000);
+			var someIntervalId;
+			function startTimer(){
+				someIntervalId = setInterval(countdown, 1000);
+			}
 			
-			$countdownTimer.html("some num");
-
-			// TO DO...
-			// if I build my own - remove flipclock from package.json
+			startTimer();
 
 		})
 		.fail(function(){
