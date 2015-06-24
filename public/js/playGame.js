@@ -20,16 +20,19 @@ $(function() {
 	var $audioPreviewUrl = $("#audioPreviewUrl");
 	var $divUserInputGuess = $("#divUserInputGuess");
 	var $inputGuessForm = $("#inputGuessForm");
+	var $countdown = $("#countdown");
 	var $divSongResults = $("#divSongResults");
 	var $divScore = $("#divScore");
 	var $pSongResults = $("#pSongResults");
 	var dataSpotify;
 	var $userInputGuess = $("#userInputGuess");
 
+
 	// hide parts of the page on inital page load
 	$divUserInputGuess.hide();
 	$divSongResults.hide();
 	$divScore.hide();
+	$countdown.hide()
 
 	// when "start" button/form is clicked, make request and play new song
 	$startGameForm.on("submit", function(event){		// why is on.submit not working, but on.click works?
@@ -69,7 +72,9 @@ $(function() {
 			// hide the start button, show the guess form, hide the results from previous answer
 			$startGameForm.hide();
 			$divUserInputGuess.show();
+			$countdown.show();
 			$divSongResults.hide();
+			$divScore.hide();
 		})
 		.fail(function(){
 			console.log("error with ajax request to Spotify API");
@@ -99,6 +104,7 @@ $(function() {
 		$divSongResults.show();
 		$startButton.val("Play again");
 		$startGameForm.show();
+		$countdown.hide();
 		
 		// check user's guess against song results
 		var guessAsIs = $userInputGuess.val();
