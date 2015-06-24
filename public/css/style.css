@@ -23,3 +23,8 @@ p {
 ul {
 	list-style: none;
 }
+
+#leftContainer, #rightContainer {
+	float: left;
+	padding: 3%;
+}

@@ -3,40 +3,49 @@
 
 <h1>Play game!!!!</h1>
 
-<!-- start & 'play again' button -->
-<div id="divStartGame">
-	<form id="startGameForm" action="/othertest">
-		<input type="submit" value="start" class="button" id="startButton">
-	</form>
-</div>
+<div id="leftContainer">
 
-<!-- audio tag for playing song previews-->
-<div>
-	<audio id="audioPreviewUrl" src="" alt=""></audio>
-</div>
+	<!-- start & 'play again' button -->
+	<div id="divStartGame">
+		<form id="startGameForm" action="/othertest">
+			<input type="submit" value="start" class="button" id="startButton">
+		</form>
+	</div>
 
-<!-- user guess input form -->
-<div id="divUserInputGuess">
-	<form id="inputGuessForm" action="/test">
-		<div>
-			<label for="userInputGuess">Guess the song name or artist: </label>
-			<input type="text" name="userInputGuess" placeholder="??????" class="textField">
-		</div>
-		<div>
-			<input type="submit" value="Guess" class="button">
-		</div>
-	</form>
-</div>
+	<!-- audio tag for playing song previews-->
+	<div>
+		<audio id="audioPreviewUrl" src="" alt=""></audio>
+	</div>
 
-<!-- song results -->
-<div id="divSongResults">
-	<ul id="pSongResults"></ul>
-</div>
+	<!-- user guess input form -->
+	<div id="divUserInputGuess">
+		<form id="inputGuessForm" action="/test">
+			<div>
+				<label for="userInputGuess">Guess the song name or artist: </label>
+				<input type="text" name="userInputGuess" placeholder="??????" class="textField">
+			</div>
+			<div>
+				<input type="submit" value="Guess" class="button">
+			</div>
+		</form>
+	</div>
 
-<!-- score -->
-<div id="divScore">
-	<p>show score info here</p>
-</div>
+	<!-- song results -->
+	<div id="divSongResults">
+		<ul id="pSongResults"></ul>
+	</div>
+
+</div> <!-- close div leftContainer -->
+
+
+<div id="rightContainer">
+
+	<!-- score -->
+	<div id="divScore">
+		<p>show score info here</p>
+	</div>
+
+</div> <!-- close div rightContainer -->
 
 
 <!-- bring in custom js scripts for this page -->
