@@ -61,19 +61,16 @@ app.post("/signup", function(req, res){
 	console.log(newUser);		// this displays password in terminal...ok or no?
 
 	db.User.create(newUser, function(err, user){
-		if(user){
-			console.log(user);
-			req.login(user); // set the session id for this user to be the user's id from our DB
-			
-			// do I need to get the user.id first?
-
-			res.redirect("/users/:user_id/edit");
-		} else {
+		if(err){
 			console.log(err);
 			//res.redirect("/signup");  // using redirect instead of render because render creates a post request when we don't want one
 			res.render("errors/404");
+		} else {
+			console.log(user);
+			req.login(user); // set the session id for this user to be the user's id from our DB
+			res.redirect("/users/" + user._id + "/edit");
 		}
-	})
+	});
 });
 
 //_______LOGIN_______
@@ -99,18 +96,22 @@ app.get("/users/:user_id", function(req, res){
 	res.render("users/show");
 });
 
-// EDIT - GET "edit"
-// show form to edit user's bio
-app.get("/users/:user_id/edit", function(req, res){
-	res.render("users/edit");
-});
-
 // SHOW - POST "show"
 // post updated/edited bio info & redirect to the users/show page
 app.post("/users/:user_id", function(req, res){
 	// do stuff
 	res.redirect("/users/:user_id");
 });
+
+// EDIT - GET "edit"
+// show form to edit user's bio
+app.get("/users/:user_id/edit", function(req, res){
+	db.User.findById(req.params.user_id, function(err, user){
+		res.render("users/edit", {user:user});
+	});
+});
+
+
 
 //_______PLAYLISTS ROUTES_______
 
