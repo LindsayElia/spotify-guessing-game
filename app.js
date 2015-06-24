@@ -6,8 +6,8 @@ var db = require("./models");
 var methodOverride = require("method-override");
 var session = require("cookie-session");
 var morgan = require("morgan");
-// var loginMiddleware = require("./middleware/loginHelper");
-// var routeMiddleware = require("./middleware/routeHelper");
+var loginMiddleware = require("./middleware/loginHelper");
+var routeMiddleware = require("./middleware/routeHelper");
 var favicon = require("serve-favicon");
 
 // not sure this is the correct format for bringing in dotenv ?
@@ -19,13 +19,16 @@ app.use(morgan("tiny"));
 app.use(express.static(__dirname + "/public"));
 app.use(favicon(__dirname + "/public/favicon.ico"));
 app.use(bodyParser.urlencoded({extended:true}));
-// app.use(loginMiddleware);
 
-// app.use(session({
-// 	maxAge: ,	//number
-// 	secret: "",	//string
-// 	name: "" 	//string
-// }));
+// use loginHelpers functions in entire app.js file
+app.use(loginMiddleware);
+
+// configure & use cookie-session module
+app.use(session({
+	maxAge: 7200000,	// 2 hours, in milliseconds
+	secret: "music-lovers-key",
+	name: "spotify-game-with-friends"	// name for cookie
+}));
 
 //______________ROUTES______________
 
