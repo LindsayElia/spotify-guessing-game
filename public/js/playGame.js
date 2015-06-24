@@ -26,6 +26,8 @@ $(function() {
 	var $pSongResults = $("#pSongResults");
 	var dataSpotify;
 	var $userInputGuess = $("#userInputGuess");
+	var scoreCorrect = 0;
+	var scoreIncorrect = 0;
 
 
 	// hide parts of the page on inital page load
@@ -109,14 +111,44 @@ $(function() {
 		// check user's guess against song results
 		var guessAsIs = $userInputGuess.val();
 		var guessLowerCased = guessAsIs.toLowerCase();
-		console.log(guessLowerCased);
+		console.log("guessLowerCased is " + guessLowerCased);
 
-		var answerArtist = dataSpotify.name;
-		var answerSong = dataSpotify.album.name;
+		var answerArtist = dataSpotify.artists[0].name;
+		var answerSong = dataSpotify.name;
 		var answer = answerArtist.toLowerCase() + " " + answerSong.toLowerCase();
-		console.log(answer);
+		console.log("var answer is " + answer);
 
-		var regExp = new RegExp("ab+c");
+		// NOTE - I tried using regular expressions with match() but it had to match the entire string??
+			// var regExp = new RegExp(answer);
+			// console.log("regExp is " + regExp);
+			// var isMatch = guessLowerCased.match(regExp);
+			// console.log("var isMatch is " + isMatch);
+			// if (isMatch && isMatch.length > 0){
+			// 	console.log("match - true");
+			// 	return true;
+			// } else {
+			// 	console.log("match - false");
+			// 	return false;
+			// }
+
+		// when a user does not type anything or only types one character, return wrong answer
+		if (guessLowerCased <=1){
+			console.log("answer is incorrect");
+			scoreIncorrect = scoreIncorrect + 1;
+			
+		} 
+		// if answer includes guess, return correct answer
+		// using .includes() here which is "experimental" according to MDN but seems to work!
+		else if (answer.includes(guessLowerCased)){
+			console.log("answer is correct!!");
+			scoreCorrect = scoreCorrect + 1;
+		} 
+		// otherwise, return wrong answer
+		else {
+			console.log("answer is incorrect");
+			scoreIncorrect = scoreIncorrect + 1;
+		}
+
 		
 
 
