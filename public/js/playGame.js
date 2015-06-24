@@ -14,6 +14,7 @@ $(function() {
 	var currentSong;
 	var counter = 0;
 	var $startGameForm = $("#startGameForm");
+	var $startButton = $("#startButton");
 	var $audioPreviewUrl = $("#audioPreviewUrl");
 	var $divUserInputGuess = $("#divUserInputGuess");
 	var $inputGuessForm = $("#inputGuessForm");
@@ -79,7 +80,12 @@ $(function() {
 	$inputGuessForm.on("submit", function(event){
 		event.preventDefault();
 		console.log("#divUserInputGuess submitted");
-		$pSongResults.html("<li>" + dataSpotify.artists[0].name + "</li>");
+		$pSongResults.html("<li><img src='" + dataSpotify.album.images[1].url + 
+							"' height='" + dataSpotify.album.images[1].height + 
+							"' width='" + dataSpotify.album.images[1].width + "'></li>" +
+							"<li>Artist: " + dataSpotify.name + "</li>" + 
+							"<li>Song title: " + dataSpotify.album.name + "</li>" +
+							"<li>Album: " + dataSpotify.artists[0].name + "</li>");
 
 		// hide the guess button & show the results form
 		$divUserInputGuess.hide();
@@ -87,6 +93,8 @@ $(function() {
 
 		// stop music from playing
 		$audioPreviewUrl[0].pause();
+		$startButton.val("Play again");
+		$startGameForm.show();
 
 	});
 
