@@ -63,9 +63,10 @@ $(function() {
 				$audioPreviewUrl[0].play();
 			});
 
-			// hide the start button & show the guess form
+			// hide the start button, show the guess form, hide the results from previous answer
 			$startGameForm.hide();
 			$divUserInputGuess.show();
+			$divSongResults.hide();
 		})
 		.fail(function(){
 			console.log("error with ajax request to Spotify API");
@@ -87,14 +88,15 @@ $(function() {
 							"<li>Song title: " + dataSpotify.album.name + "</li>" +
 							"<li>Album: " + dataSpotify.artists[0].name + "</li>");
 
-		// hide the guess button & show the results form
-		$divUserInputGuess.hide();
-		$divSongResults.show();
-
 		// stop music from playing
 		$audioPreviewUrl[0].pause();
+
+		// hide the guess button, show the results form & score info
+		$divUserInputGuess.hide();
+		$divSongResults.show();
 		$startButton.val("Play again");
 		$startGameForm.show();
+		$divScore.show();
 
 	});
 
