@@ -85,18 +85,19 @@ $(function() {
 			// all previews are 30 seconds according to Spotify API documentation
 			$countdown.show();
 
-			var timeLeft = 5;
+			var timeLeft = 29;
 			function countdown(){
 				if (timeLeft === 0){
 					$countdownTimerHeader.html("");
 					$countdownTimer.html("time is up");
-					console.log("time is up");
+					// console.log("time is up");
 					clearInterval(someIntervalId);
 				}
 				else {
 				//	setTimeout(countdown, 1000);
+					$countdownTimerHeader.html("Seconds left to guess:");
 					$countdownTimer.html(timeLeft);
-					console.log(timeLeft)
+					// console.log(timeLeft)
 					timeLeft--;
 				}
 			}
