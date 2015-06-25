@@ -130,7 +130,8 @@ app.put("/users/:user_id", routeHelper.ensureSameUser, function(req, res){
 
 	var userUpdates = {};
 	userUpdates.avatarUrl = req.body.userAvatarUrl;
-//	userUpdates.genres.push(req.body.userGenres); // having trouble updating the array here
+//	userUpdates.genres.push(req.body.userGenres); 
+// having trouble updating the genres array here
 
 	db.User.findByIdAndUpdate(req.params.user_id, userUpdates, function(err, user){
 		if(err){

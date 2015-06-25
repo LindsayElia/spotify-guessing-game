@@ -1,19 +1,25 @@
 <!-- show scores for ALL players -->
 <% include ../partials/header %>
 
-<p><a href="/signup"><button class="button">Signup</button></a></p>
+<p>Index Users Page - HOME page<p>
 
-<p><a href="/login"><button class="button">Login</button></a></p>
+<% if(req.session.id === null || req.session.id === undefined){  %>
 
-<p>These are the scores for all players</p>
+	<p><a href="/signup"><button class="button">Signup</button></a></p>
+
+	<p><a href="/login"><button class="button">Login</button></a></p>
+
+<%  }  %>
+
 
 <% if(req.session.id !== null && req.session.id !== undefined){  %>
+	<p><a href="/users/<%=  %>">Go to 'show' user page</a></p>
+	<p><a href="/users/<%=  %>/edit">Edit user info</a></p>
+
+	<div>Logged in currently as <%=  %> </div>
 	<div><a href="/logout"><button class="button">Logout</button></a></div>
 <%  }  %>
 
-<script>
-	
-	console.log("hello");
-</script>
+<p>This will display the scores for all players</p>
 
 <% include ../partials/footer %>

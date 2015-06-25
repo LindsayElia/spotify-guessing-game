@@ -3,10 +3,6 @@
 
 <p>Edit page for single user's bio</p>
 <p>Please fill in some info about yourself before playing.</p>
-<p>Or, you can play against the computer, find friends to play against, or create a playlist to challenge friends with.</p>
-<a href="/play/computer"><button class="button">Play computer</button></a>
-<a href=""><button class="button">Find friends</button></a>
-<a href=""><button class="button">Create playlist</button></a>
 
 <p>your email: <%= user.email %></p>
 
@@ -27,6 +23,7 @@
 </form>
 
 
+<p><a href="/users/<%= user._id %>">Back to 'show' user page</a></p>
 
 <p><a href="/index">Back to high scores</a></p>
 
@@ -34,12 +31,6 @@
 
 <div>Logged in currently as <%= user.email %> </div>
 <div><a href="/logout"><button class="button">Logout</button></a></div>
-
-<script>
-	
-	console.log("hello");
-</script>
-
 
 
 <% include ../partials/footer %>
