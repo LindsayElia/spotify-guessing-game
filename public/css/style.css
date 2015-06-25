@@ -31,3 +31,23 @@ ul {
 	padding: 3%;
 	width: 44%;
 }
+
+.logout {
+	background-color: tomato;
+}
+
+.submitAction {
+	background-color: greenyellow;
+}
+
+.home {
+	background-color: aquamarine;
+}
+
+.border {
+	border: 1px solid gray;
+	margin: 5px;
+	padding: 10px;
+}
+
+

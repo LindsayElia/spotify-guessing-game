@@ -18,19 +18,18 @@
 	</p>
 	-->
 
-	<input type="submit" value="Update Account Details" class="button">
+	<input type="submit" value="Update Account Details" class="button submitAction">
 
 </form>
 
 
-<p><a href="/users/<%= user._id %>">Back to 'show' user page</a></p>
-
-<p><a href="/index">Back to high scores</a></p>
-
-
-
 <div>Logged in currently as <%= user.email %> </div>
-<div><a href="/logout"><button class="button">Logout</button></a></div>
+<div>
+	<a href="/users/<%= user._id %>"><button class="button">Go to 'show' user page</button></a>
+	<a href="/index"><button class="button home">Go Home</button></a>
+	<a href="/logout"><button class="button logout">Logout</button></a>
+</div>
+
 
 
 <% include ../partials/footer %>

@@ -5,17 +5,13 @@
 <p>"show" player's info</p>
 <p>show player friends</p>
 
-<p>Or, you can play against the computer, find friends to play against, or create a playlist to challenge friends with.</p>
-<a href="/play/computer"><button class="button">Play computer</button></a>
-<a href=""><button class="button">Find friends</button></a>
-<a href=""><button class="button">Create playlist</button></a>
-
-<p><a href="/users/<%= user._id %>/edit">Edit user info</a></p>
-
-<p><a href="/index">Back to high scores</a></p>
 
 <div>Logged in currently as <%= user.email %> </div>
-<div><a href="/logout"><button class="button">Logout</button></a></div>
+<div>
+	<a href="/users/<%= user._id %>/edit"><button class="button">Edit user info</button></a>
+	<a href="/index"><button class="button home">Go Home</button></a>
+	<a href="/logout"><button class="button logout">Logout</button></a>
+</div>
 
 
 <!-- bring in custom js scripts for this page -->
