@@ -13,7 +13,7 @@ var routeHelpers = {
 	
 	// check that user is logged in as a certain user
 	ensureSameUser: function(req, res, next){
-		db.User.findById(req.params.id, function(err, user){
+		db.User.findById(req.params.user_id, function(err, user){
 			if(user.id !== req.session.id){
 				res.redirect("/index");
 			} else {

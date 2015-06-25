@@ -7,4 +7,13 @@
 
 <p>These are the scores for all players</p>
 
+<% if(req.session.id !== null && req.session.id !== undefined){  %>
+	<div><a href="/logout"><button class="button">Logout</button></a></div>
+<%  }  %>
+
+<script>
+	
+	console.log("hello");
+</script>
+
 <% include ../partials/footer %>

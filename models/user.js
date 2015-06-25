@@ -79,22 +79,27 @@ userSchema.pre("save", function(next){
 // if it is, call the function to check the user's password
 // class method
 userSchema.statics.authenticate = function(formData, callback){
+	console.log("making it into the authenticate method");
+	console.log(formData);
 	this.findOne({
 		email: formData.email	// check that we have a user with this email
-	}),
+	},
 	function(err, user){ // this is the function we pass out of this function as a callback
+		console.log(user);
 		if(user === null){
 			callback("Invalid email or password, try again.", null); // invalid email
 		} else {
-			user.checkPassword(formData, callback); // call the function we define below to check password
+			console.log("in the authenticate method about to call checkPassword");
+			user.checkPassword(formData.password, callback); // call the function we define below to check password
 		}
-	}
-}
+	});
+};
 
 // compare the user's password input to database password
 // instance method
 userSchema.methods.checkPassword = function(inputPassword, callback){
 	var user = this;
+	console.log("inside of checkPassword");
 	// user.password is the hashed, salted password we have stored in our database already
 	bcrypt.compare(inputPassword, user.password, function(err, isMatch){
 		if(isMatch){

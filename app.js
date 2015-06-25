@@ -41,7 +41,7 @@ app.get("/", function(req, res){
 
 // INDEX - show "index"
 app.get("/index", function(req, res){
-	res.render("users/index");
+	res.render("users/index", {req:req});
 });
 
 //_______SIGNUP_______
@@ -84,8 +84,23 @@ app.get("/login", routeHelper.loggedInStop, function(req, res){
 // LOGIN - POST "login"
 // sign the user in and redirect to page showing all players "/index"
 app.post("/login", function(req, res){
-	// do stuff
-	res.redirect("/index");
+	var userLoggingIn = {};
+	userLoggingIn.email = req.body.userEmail;
+	userLoggingIn.password = req.body.userPass;
+	console.log(userLoggingIn);	
+
+	db.User.authenticate(userLoggingIn, function(err, user){
+		if (!err && user !== null){
+			req.login(user); // set the session id to the user id for this user
+			// res.redirect("/users/" + user_id); // send the user to their own show page
+			res.redirect("/users/" + user._id);
+		} else {
+			console.log(err);
+			res.render("users/login", {err:err}); 
+// probably want to add some error messaging to login page if error
+		}
+	});
+
 });
 
 //_______LOGOUT_______
