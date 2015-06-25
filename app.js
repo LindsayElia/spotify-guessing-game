@@ -93,7 +93,7 @@ app.post("/login", function(req, res){
 		if (!err && user !== null){
 			req.login(user); // set the session id to the user id for this user
 			// res.redirect("/users/" + user_id); // send the user to their own show page
-			res.redirect("/users/" + user._id);
+			res.redirect("/index");
 		} else {
 			console.log(err);
 			res.render("users/login", {err:err}); 
