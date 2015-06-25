@@ -6,8 +6,8 @@ var db = require("./models");
 var methodOverride = require("method-override");
 var session = require("cookie-session");
 var morgan = require("morgan");
-var loginMiddleware = require("./middleware/loginHelper");
-var routeMiddleware = require("./middleware/routeHelper");
+var loginHelper = require("./middleware/loginHelper");
+var routeHelper = require("./middleware/routeHelper");
 var favicon = require("serve-favicon");
 
 // not sure this is the correct format for bringing in dotenv ?
@@ -21,7 +21,7 @@ app.use(favicon(__dirname + "/public/favicon.ico"));
 app.use(bodyParser.urlencoded({extended:true}));
 
 // use loginHelpers functions in entire app.js file
-app.use(loginMiddleware);
+app.use(loginHelper);
 
 // configure & use cookie-session module
 app.use(session({
@@ -48,7 +48,7 @@ app.get("/index", function(req, res){
 
 // SIGNUP - GET "signup"
 // show the signup page
-app.get("/signup", function(req, res){
+app.get("/signup", routeHelper.loggedInStop, function(req, res){
 	res.render("users/signup");
 });
 
@@ -64,7 +64,7 @@ app.post("/signup", function(req, res){
 		if(err){
 			console.log(err);
 			//res.redirect("/signup");  // using redirect instead of render because render creates a post request when we don't want one
-			res.render("errors/404");
+			res.render("errors/500");
 		} else {
 			console.log(user);
 			req.login(user); // set the session id for this user to be the user's id from our DB
@@ -77,7 +77,7 @@ app.post("/signup", function(req, res){
 
 // LOGIN - GET "login"
 // show the login page
-app.get("/login", function(req, res){
+app.get("/login", routeHelper.loggedInStop, function(req, res){
 	res.render("users/login");
 });
 
@@ -88,29 +88,57 @@ app.post("/login", function(req, res){
 	res.redirect("/index");
 });
 
+//_______LOGOUT_______
+app.get("/logout", function(req, res){
+	req.logout();
+	res.redirect("/index");
+});
+
 //_______USER ROUTES_______
 
 // SHOW - GET "show"
 // show user's bio, friends, and playlists
 app.get("/users/:user_id", function(req, res){
-	res.render("users/show");
+	db.User.findById(req.params.user_id, function(err, user){
+		if(err){
+			console.log(err);
+			res.render("errors/500");
+		} else {
+			res.render("users/show", {user:user});
+		}
+	});
 });
 
-// SHOW - POST "show"
+// UPDATE - PUT "edit"
 // post updated/edited bio info & redirect to the users/show page
-app.post("/users/:user_id", function(req, res){
-	// do stuff
-	res.redirect("/users/:user_id");
+app.put("/users/:user_id", function(req, res){
+
+	var userUpdates = {};
+	userUpdates.avatarUrl = req.body.userAvatarUrl;
+//	userUpdates.genres.push(req.body.userGenres); // having trouble updating the array here
+
+	db.User.findByIdAndUpdate(req.params.user_id, userUpdates, function(err, user){
+		if(err){
+			console.log(err);
+			res.render("errors/500");
+		} else {
+			res.redirect("/users/" + user._id);
+		}
+	});
 });
 
 // EDIT - GET "edit"
 // show form to edit user's bio
-app.get("/users/:user_id/edit", function(req, res){
+app.get("/users/:user_id/edit", routeHelper.loggedInContinue, function(req, res){
 	db.User.findById(req.params.user_id, function(err, user){
-		res.render("users/edit", {user:user});
+		if(err){
+			console.log(err);
+			res.render("errors/500");
+		} else {
+			res.render("users/edit", {user:user});
+		}
 	});
 });
-
 
 
 //_______PLAYLISTS ROUTES_______
@@ -136,11 +164,17 @@ app.post("playlists/:playlist_id", function(req, res){
 
 //_______ROUNDS ROUTES_______
 
-// PLAY - GET "play"
-app.get("/play", function(req, res){
+// PLAY - GET "play" - play computer
+app.get("/play/computer", function(req, res){
+	// do stuff
 	res.render("rounds/play");
 });
 
+// PLAY - GET "play" - play computer
+app.get("/play/:playlist_id", function(req, res){
+	// do stuff
+	res.render("rounds/play");
+});
 
 // 404 page - oopsie
 app.get("*", function(req, res){

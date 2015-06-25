@@ -2,10 +2,38 @@
 <% include ../partials/header %>
 
 <p>Edit page for single user's bio</p>
-<p> this user: <%= user.email %></p>
+<p>Please fill in some info about yourself before playing.</p>
+<p>Or, you can play against the computer, find friends to play against, or create a playlist to challenge friends with.</p>
+<a href="/play/computer"><button class="button">Play computer</button></a>
+<a href=""><button class="button">Find friends</button></a>
+<a href=""><button class="button">Create playlist</button></a>
+
+<p>your email: <%= user.email %></p>
+
+<form action="/users/<%= user._id %>?_method=PUT" method="POST">
+	<p>
+		<label for="userAvatarUrl">Link to an image for your avatar: </label>
+		<input type="text" id="userAvatarUrl" name="userAvatarUrl" placeholder="optional" class="textField">
+	</p>
+	<!--
+	<p>
+		<label for="userGenres">I'm an expert in these genres of music: </label>
+		<input type="text" id="userGenres" name="userGenres" placeholder="Rock, Pop, Classical" class="textField">
+	</p>
+	-->
+
+	<input type="submit" value="Update Account Details" class="button">
+
+</form>
 
 
 
+<p><a href="/index">Back to high scores</a></p>
+
+
+
+<div>Logged in currently as <%= user.email %> </div>
+<div><a href="/logout"><button class="button">Logout</button></a></div>
 
 
 <% include ../partials/footer %>

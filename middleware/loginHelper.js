@@ -4,7 +4,8 @@ var loginHelpers = function(req, res, next){
 
 	// set session id to match user id
 	req.login = function(user){
-		req.session.id = user._id;	// is ._id the same as .id ? I think so?
+		req.session.id = user._id;	// I think ._id is the same as .id, 
+		// either will work with mongoose, both point to the document id in our database
 	};
 
 	// set session id to null

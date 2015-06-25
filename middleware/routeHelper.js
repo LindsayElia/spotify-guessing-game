@@ -1,19 +1,18 @@
 var db = require("../models");
 
-var routeHelpters = {
+var routeHelpers = {
 
-	// ensure that user is logged in
-	// if user is not logged in, session id will be null(most times) or undefined(first time)
-	ensureLoggedIn: function(req, res, next){
+	// if a user is not logged in, session id will be null(most times) or undefined(first time)
+	loggedInContinue: function(req, res, next){
 		if(req.session.id !== null && req.session.id !== undefined){
 			return next();
 		} else {
 			res.redirect("/login");
 		}
 	},
-
-	// ensure user id matches session id
-	ensureCorrectUser: function(req, res, next){
+	
+	// check that user is logged in as a certain user
+	ensureSameUser: function(req, res, next){
 		db.User.findById(req.params.id, function(err, user){
 			if(user.id !== req.session.id){
 				res.redirect("/index");
@@ -24,7 +23,9 @@ var routeHelpters = {
 	},
 
 	// stop users from logging in more than once during a session
-	preventLoginSignup: function(req, res, next){
+	// don't let people logged in visit the login or the sign up page
+	// use this in the login and signup routes
+	loggedInStop: function(req, res, next){
 		if(req.session.id !== null && req.session.id !== undefined){
 			res.redirect("/index");
 		} else {
@@ -34,4 +35,4 @@ var routeHelpters = {
 
 };
 
-module.exports = routeHelpters;
+module.exports = routeHelpers;
