@@ -10,8 +10,21 @@ var loginHelper = require("./middleware/loginHelper");
 var routeHelper = require("./middleware/routeHelper");
 var favicon = require("serve-favicon");
 
-// not sure this is the correct format for bringing in dotenv ?
-// require('dotenv').load();
+// require and load dotenv - since we only use dotenv here, 
+// and don't refer to it, we don't need to set it to a variable, like:
+	// var dotenv = require("dotenv");
+	// dotenv.load();
+require('dotenv').load();
+
+var client_id = process.env.SPOTIFY_CLIENT_ID;
+// console.log(client_id, "-- SPOTIFY_CLIENT_ID");
+var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+// console.log(client_secret, "-- SPOTIFY_CLIENT_SECRET");
+
+// SPOTIFY API REQUIRES THIS
+var request = require("request");
+var querystring = require("querystring");
+var cookieParser = require("cookie-parser");
 
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
@@ -29,6 +42,27 @@ app.use(session({
 	secret: "music-lovers-key",		// is this the key used to make the hash?
 	name: "spotify-game-with-friends"	// name for cookie
 }));
+
+// SPOTIFY API REQUIRES THIS
+app.use(cookieParser());
+
+/** SPOTIFY API REQUIRES THIS
+ * Generates a random string containing numbers and letters
+ * @param  {number} length The length of the string
+ * @return {string} The generated string
+ */
+var generateRandomString = function(length) {
+	var text = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	for (var i = 0; i < length; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return text;
+};
+
+var stateKey = 'spotify_auth_state';
+
 
 //______________ROUTES______________
 
@@ -75,13 +109,13 @@ app.post("/signup", function(req, res){
 
 //_______LOGIN_______
 
-// LOGIN - GET "login"
+// LOGIN - GET "login" - simple
 // show the login page
 app.get("/login", routeHelper.loggedInStop, function(req, res){
 	res.render("users/login");
 });
 
-// LOGIN - POST "login"
+// LOGIN - POST "login" - simple
 // sign the user in and redirect to page showing all players "/index"
 app.post("/login", function(req, res){
 	var userLoggingIn = {};
@@ -102,6 +136,126 @@ app.post("/login", function(req, res){
 	});
 
 });
+
+
+//_______LOGIN WITH SPOTIFY_______
+
+// SPOTIFY - LOGIN
+app.get("/login/spotify", function(req, res){
+	
+	var state = generateRandomString(16);
+ 	res.cookie(stateKey, state);
+
+ 	// my application requests authorization from Spotify
+ 	// requesting permission from user to ___ the user's:
+ 		// read, name & profile image
+ 		// read, email
+ 		// read, private playlists
+ 		// modify, private playlists
+ 		// read, followers
+ 		// modify, followers
+ 		// read, library (tracks only)
+	var scope = "user-read-private user-read-email playlist-read-private playlist-modify-private user-follow-read user-follow-modify user-library-read"; 
+	res.redirect("https://accounts.spotify.com/authorize?" + querystring.stringify({
+		response_type: "code",
+		client_id: client_id,
+		scope: scope,
+		redirect_uri: redirect_uri,
+		state: state
+	}));
+
+});
+
+// SPOTIFY - RETURN TO MY APP
+app.get("/callback", function(req, res){
+
+	// my application requests refresh and access tokens from Spotify
+	// after checking the state parameter
+
+	var code = req.query.code || null;
+	var state = req.query.state || null;
+	var storedState = req.cookies ? req.cookies[stateKey] : null;
+
+	// if state is not set, go to 404 (?) page
+	if (state === null || state !== storedState) {
+		res.redirect("/#" + querystring.stringify({
+			error: "state_mismatch"
+	}));
+	} 
+	// if state is set, get tokens
+	else {
+		res.clearCookie(stateKey);
+		var authOptions = {
+			url: "https://accounts.spotify.com/api/token",
+			form: {
+				code: code,
+				redirect_uri: redirect_uri,
+				grant_type: "authorization_code"
+		},
+			headers: {
+				"Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64"))
+		},
+			json: true
+		};
+
+		// make a POST request to the URL in authOptions
+		request.post(authOptions, function(error, response, body){
+			if (!error && response.statusCode === 200){
+
+				var access_token = body.access_token,
+					refresh_token = body.refresh_token;
+
+				var options = {
+					url: "https://api.spotify.com/v1/me",
+					headers: { "Authorization": "Bearer " + access_token },
+					json: true
+				};
+
+				// use the access token to access the Spotify Web API
+				request.get(options, function(error, response, body){
+					console.log(body);
+				});
+
+				// we can also pass the token to the browser to make requests from there
+				res.redirect("/#" + querystring.stringify({
+					access_token: access_token,
+					refresh_token: refresh_token
+				}));
+				} else {
+					res.redirect("/#" + querystring.stringify({
+						error: "invalid_token"
+				}));
+				}
+		});
+	}
+});
+
+// SPOTIFY - GET NEW TOKENS
+app.get('/refresh_token', function(req, res){
+
+	// requesting access token from refresh token
+	var refresh_token = req.query.refresh_token;
+	var authOptions = {
+		url: "https://accounts.spotify.com/api/token",
+		headers: { "Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64")) },
+		form: {
+			grant_type: "refresh_token",
+			refresh_token: refresh_token
+		},
+		json: true
+	};
+
+	request.post(authOptions, function(error, response, body){
+		if (!error && response.statusCode === 200){
+			var access_token = body.access_token;
+			res.send({
+				"access_token": access_token
+			});
+		}
+	});
+
+});
+
 
 //_______LOGOUT_______
 app.get("/logout", function(req, res){

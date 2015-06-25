@@ -4,12 +4,7 @@ body {
 	font-size: 1em;
 }
 
-/*
-p { 
-	border: 1px solid black;
-}
-*/
-
+/* begin button styles */
 .button {
 	font-size: 1em;
 	background-color: seashell;
@@ -17,6 +12,19 @@ p {
 	padding: 6px 10px;
 	margin: 10px;
 }
+
+.logout {
+	background-color: tomato;
+}
+
+.submitAction {
+	background-color: greenyellow;
+}
+
+.home {
+	background-color: aquamarine;
+}
+/* end button styles */
 
 .textField {
 	font-size: 1em;
@@ -30,18 +38,6 @@ ul {
 	float: left;
 	padding: 3%;
 	width: 44%;
-}
-
-.logout {
-	background-color: tomato;
-}
-
-.submitAction {
-	background-color: greenyellow;
-}
-
-.home {
-	background-color: aquamarine;
 }
 
 .border {
