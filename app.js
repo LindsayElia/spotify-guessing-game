@@ -98,7 +98,7 @@ app.get("/logout", function(req, res){
 
 // SHOW - GET "show"
 // show user's bio, friends, and playlists
-app.get("/users/:user_id", function(req, res){
+app.get("/users/:user_id", routeHelper.ensureSameUser, function(req, res){
 	db.User.findById(req.params.user_id, function(err, user){
 		if(err){
 			console.log(err);
@@ -111,7 +111,7 @@ app.get("/users/:user_id", function(req, res){
 
 // UPDATE - PUT "edit"
 // post updated/edited bio info & redirect to the users/show page
-app.put("/users/:user_id", function(req, res){
+app.put("/users/:user_id", routeHelper.ensureSameUser, function(req, res){
 
 	var userUpdates = {};
 	userUpdates.avatarUrl = req.body.userAvatarUrl;
@@ -129,7 +129,7 @@ app.put("/users/:user_id", function(req, res){
 
 // EDIT - GET "edit"
 // show form to edit user's bio
-app.get("/users/:user_id/edit", routeHelper.loggedInContinue, function(req, res){
+app.get("/users/:user_id/edit", routeHelper.ensureSameUser, function(req, res){
 	db.User.findById(req.params.user_id, function(err, user){
 		if(err){
 			console.log(err);
@@ -145,19 +145,19 @@ app.get("/users/:user_id/edit", routeHelper.loggedInContinue, function(req, res)
 
 // NEW - GET "new"
 // search songs to add to playlist
-app.get("/playlists/new", function(req, res){
+app.get("/playlists/new", routeHelper.ensureSameUser, function(req, res){
 	res.render("playlists/new");
 });
 
 // EDIT - GET "edit"
 // edit an existing playlist
-app.get("/playlists/:playlist_id", function(req, res){
+app.get("/playlists/:playlist_id", routeHelper.ensureSameUser, function(req, res){
 	res.render("playlists/edit");
 });
 
 // SHOW - POST to users/show
 // post updated/edited playlist info & redirect to the user's show page
-app.post("playlists/:playlist_id", function(req, res){
+app.post("playlists/:playlist_id", routeHelper.ensureSameUser, function(req, res){
 	// do stuff
 	res.redirect("/users/:user_id");
 });
@@ -165,13 +165,13 @@ app.post("playlists/:playlist_id", function(req, res){
 //_______ROUNDS ROUTES_______
 
 // PLAY - GET "play" - play computer
-app.get("/play/computer", function(req, res){
+app.get("/play/computer", routeHelper.ensureSameUser, function(req, res){
 	// do stuff
 	res.render("rounds/play");
 });
 
 // PLAY - GET "play" - play computer
-app.get("/play/:playlist_id", function(req, res){
+app.get("/play/:playlist_id", routeHelper.ensureSameUser, function(req, res){
 	// do stuff
 	res.render("rounds/play");
 });
