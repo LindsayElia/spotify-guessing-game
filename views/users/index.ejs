@@ -7,11 +7,9 @@
 
 	<p>Index Users Page - HOME page - PUBLIC<p>
 
-<div class="border">
-	<h3>Sign up with email - simple login</h3>
-	<p>New? <a href="/signup"><button class="button">Signup</button></a></p>
-	<p>Have a 'simple' account? <a href="/login"><button class="button">Login Simple</button></a></p>
-</div>
+	<div class="border">
+		<p>About this application...</p>
+	</div>
 
 	<div class="border">
 		<h3>Sign in using your Spotify Account</h3>
@@ -19,6 +17,8 @@
 	    <a href="/login/spotify"><button class="button">Login with Spotify</button></a>
 
 	</div>
+
+
 
 <%  }  %>
 
@@ -29,12 +29,6 @@
 
 	<div>Logged in currently as ____<%=  %>____ </div>
 
-	<div class="border">
-		<h3>Sign in using your Spotify Account</h3>
-	    
-	    <a href="/login/spotify"><button class="button">Login with Spotify</button></a>
-
-	</div>
 
 	<div class="border" id="userProfileDiv">
 	</div>
@@ -59,7 +53,10 @@
 
 <%  }  %>
 
-<p>This will display the scores for all players</p>
+	<div class="border">
+		<p>This will display the scores for all players & shows whether or not you are logged in.</p>
+	</div>
+
 
 <!-- bring in custom js scripts for this page -->
 <script type="text/javascript" src="/js/userProfile.js"></script>

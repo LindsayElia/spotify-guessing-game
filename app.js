@@ -171,7 +171,7 @@ app.get("/callback", function(req, res){
 													console.log(user, "user in our db now, from inside findOneAndUpdate");
 													console.log(access_token, "access_token from inside findOneAndUpdate");
 													console.log(user.accessToken, "user accessToken from inside findOneAndUpdate");
-													res.redirect("/users/welcome?" + querystring.stringify({ access_token: access_token, refresh_token: refresh_token}));
+													res.redirect("/index?" + querystring.stringify({ access_token: access_token, refresh_token: refresh_token}));
 											}
 									});
 					});
@@ -209,9 +209,6 @@ app.get("/callback", function(req, res){
 
 // });
 
-app.get("/users/welcome", routeHelper.ensureSameSpotifyUser, function(req, res){
-	res.render("users/welcome");
-});
 
 
 //_______LOGOUT_______
