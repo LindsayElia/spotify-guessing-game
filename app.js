@@ -4,7 +4,8 @@ var app = express();
 var bodyParser = require("body-parser");
 var db = require("./models");
 var methodOverride = require("method-override");
-var session = require("cookie-session");
+// var session = require("cookie-session");
+var session = require("express-session");
 var morgan = require("morgan");
 var loginHelper = require("./middleware/loginHelper");
 var routeHelper = require("./middleware/routeHelper");
@@ -16,19 +17,27 @@ var favicon = require("serve-favicon");
 	// dotenv.load();
 require('dotenv').load();
 
-var client_id = process.env.SPOTIFY_CLIENT_ID;
-// console.log(client_id, "-- SPOTIFY_CLIENT_ID");
-var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-// console.log(client_secret, "-- SPOTIFY_CLIENT_SECRET");
+//var client_id = process.env.SPOTIFY_CLIENT_ID;
+//console.log(client_id, "-- SPOTIFY_CLIENT_ID");
+//var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+//console.log(client_secret, "-- SPOTIFY_CLIENT_SECRET");
 
 // comment this out while using Passport
 // will need to edit this for production:
 // var redirect_uri = "http://localhost:3000/callback";
 
+
 // SPOTIFY API REQUIRES THIS
-var request = require("request");
-var querystring = require("querystring");
-var cookieParser = require("cookie-parser");
+// var request = require("request");
+// var querystring = require("querystring");
+var cookieParser = require("cookie-parser"); // PASSPORT-SPOTIFY MIDDLEWARE WANTS THIS
+
+
+// for PASSPORT-SPOTIFY MIDDLEWARE usage
+var session = require("express-session");
+var passport = require("passport");
+var SpotifyStrategy = require("passport-spotify").Strategy;
+
 
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
@@ -41,46 +50,60 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(loginHelper);
 
 // configure & use cookie-session module
-app.use(session({
-	maxAge: 7200000,	// 2 hours, in milliseconds
-	secret: "music-lovers-key",		// is this the key used to make the hash?
-	name: "spotify-game-with-friends"	// name for cookie
-}));
+// app.use(session({
+// 	maxAge: 7200000,	// 2 hours, in milliseconds
+// 	secret: "music-lovers-key",		// is this the key used to make the hash?
+// 	name: "spotify-game-with-friends"	// name for cookie
+// }));
 
-// SPOTIFY API REQUIRES THIS
+// SPOTIFY API REQUIRES THIS & PASSPORT-SPOTIFY MIDDLEWARE WANTS THIS
 app.use(cookieParser());
+
+// PASSPORT-SPOTIFY MIDDLEWARE
+app.use(session({
+	secret: "music-lovers-key"
+}));
 
 /** SPOTIFY API REQUIRES THIS
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
-var generateRandomString = function(length) {
-	var text = "";
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+// var generateRandomString = function(length) {
+// 	var text = "";
+// 	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	for (var i = 0; i < length; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
-	}
-	return text;
-};
+// 	for (var i = 0; i < length; i++) {
+// 		text += possible.charAt(Math.floor(Math.random() * possible.length));
+// 	}
+// 	return text;
+// };
 
-var stateKey = 'spotify_auth_state';
+// var stateKey = 'spotify_auth_state';
+
 
 //______________PASSPORT-SPOTIFY MIDDLEWARE______________
-var passport = require("passport");
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
-var SpotifyStrategy = require("passport-spotify").Strategy;
+
+// change the default parameters that passport uses to pass login credentials
 passport.use(new SpotifyStrategy({
-	clientID: client_id,			// my app's credentials
-    clientSecret: client_secret,	// my app's credentials
-    callbackURL: "http://localhost:3000/auth/spotify/callback"
+	clientID: process.env.SPOTIFY_CLIENT_ID,	// my app's credentials
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,	// my app's credentials
+    callbackURL: "http://localhost:3000/callback"
 	},
-	function(accessToken, refreshToken, profile, done){
-		db.User.findOneAndUpdate({ username: profile.id }, function (err, user){
-			return done(err, user);
-		});
+	function(accessToken, refreshToken, profile, next){
+		console.log(profile, "this is the profile")
+		return next();
 	}
 ));
 
@@ -91,17 +114,16 @@ passport.use(new SpotifyStrategy({
 //_______PASSPORT-SPOTIFY ROUTES_______
 app.get("/auth/spotify", passport.authenticate("spotify", 
 	{scope : ["user-read-private", "user-read-email", "playlist-read-private", "playlist-modify-private", "user-follow-read", "user-follow-modify", "user-library-read"],
-		showDialog: true }),
+		showDialog: true })
+		// The request will be redirected to spotify for authentication
+);
+
+app.get("/callback", passport.authenticate("spotify", { failureRedirect: '/404' }),
 	function(req, res){
-		// The request will be redirected to spotify for authentication, 
-		// so this function will not be called.
+		res.redirect("/playlists/new");
 });
 
-app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedirect: '/login' }), 
-	function(req, res){
-		// Successful authentication, redirect to users/index.
-		res.redirect("/index");
-});
+
 
 
 //_______HOME_______
@@ -170,135 +192,6 @@ app.post("/login", function(req, res){
 			console.log(err);
 			res.render("users/login", {err:err}); 
 // probably want to add some error messaging to login page if error
-		}
-	});
-
-});
-
-
-//_______LOGIN WITH SPOTIFY_______
-
-// SPOTIFY - LOGIN
-app.get("/login/spotify", function(req, res){
-	
-	var state = generateRandomString(16);
- 	res.cookie(stateKey, state);
-
- 	// my application requests authorization from Spotify
- 	// requesting permission from user to ___ the user's:
- 		// read, name & profile image
- 		// read, email
- 		// read, private playlists
- 		// modify, private playlists
- 		// read, followers
- 		// modify, followers
- 		// read, library (tracks only)
-	var scope = "user-read-private user-read-email playlist-read-private playlist-modify-private user-follow-read user-follow-modify user-library-read"; 
-	res.redirect("https://accounts.spotify.com/authorize?" + querystring.stringify({
-		response_type: "code",
-		client_id: client_id,
-		scope: scope,
-		redirect_uri: redirect_uri,
-		state: state
-	}));
-
-});
-
-// SPOTIFY - RETURN TO MY APP
-app.get("/callback", function(req, res){
-
-	// my application requests refresh and access tokens from Spotify
-	// after checking the state parameter
-
-	var code = req.query.code || null;
-	var state = req.query.state || null;
-	var storedState = req.cookies ? req.cookies[stateKey] : null;
-
-	// if state is not set, go to 404 (?) page
-	if (state === null || state !== storedState) {
-		res.redirect("/#" + querystring.stringify({
-			error: "state_mismatch"
-	}));
-	} 
-	// if state is set, get tokens
-	else {
-		res.clearCookie(stateKey);
-		var authOptions = {
-			url: "https://accounts.spotify.com/api/token",
-			form: {
-				code: code,
-				redirect_uri: redirect_uri,
-				grant_type: "authorization_code"
-		},
-			headers: {
-				"Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64"))
-		},
-			json: true
-		};
-
-		// make a POST request to the URL in authOptions
-		request.post(authOptions, function(error, response, body){
-			if (!error && response.statusCode === 200){
-
-				var access_token = body.access_token,
-					refresh_token = body.refresh_token;
-
-				var options = {
-					url: "https://api.spotify.com/v1/me",
-					headers: { "Authorization": "Bearer " + access_token },
-					json: true
-				};
-
-				// use the access token to access the Spotify Web API
-				request.get(options, function(error, response, body){
-					console.log(body, "Spotify auth body");
-
-					var spotifyUser = {};
-					spotifyUser.fullName = body.display_name; // turn into fullName
-					spotifyUser.avatarUrl = body.href;	// turn into avatarUrl
-					spotifyUser.email = body.email;
-					spotifyUser.username = body.id;
-					spotifyUser.imageUrl = body.images[0].url;
-
-					console.log(spotifyUser, "spotify user info I captured");
-
-				});
-
-				// we can also pass the token to the browser to make requests from there
-				res.redirect("/#" + querystring.stringify({
-					access_token: access_token,
-					refresh_token: refresh_token
-				}));
-				} else {
-					res.redirect("/#" + querystring.stringify({
-						error: "invalid_token"
-				}));
-				}
-		});
-	}
-});
-
-// SPOTIFY - GET NEW TOKENS
-app.get('/refresh_token', function(req, res){
-
-	// requesting access token from refresh token
-	var refresh_token = req.query.refresh_token;
-	var authOptions = {
-		url: "https://accounts.spotify.com/api/token",
-		headers: { "Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64")) },
-		form: {
-			grant_type: "refresh_token",
-			refresh_token: refresh_token
-		},
-		json: true
-	};
-
-	request.post(authOptions, function(error, response, body){
-		if (!error && response.statusCode === 200){
-			var access_token = body.access_token;
-			res.send({
-				"access_token": access_token
-			});
 		}
 	});
 

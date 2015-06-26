@@ -7,7 +7,7 @@ var SALT_WORK_FACTOR = 10;
 
 //_______DEFINE USER SCHEMA_______
 var userSchema = new mongoose.Schema({
-	username: String,		// get from Spotify, id
+	spotifyId: String,		// get from Spotify, id
 	fullName: String,		// get from Spotify, display_name
 	email: {
 		type: String,
