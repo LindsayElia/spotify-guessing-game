@@ -181,7 +181,7 @@ app.get("/callback", function(req, res){
 
 	// if state is not set, go to 404 (?) page
 	if (state === null || state !== storedState) {
-		res.redirect("/#" + querystring.stringify({
+		res.redirect("/404" + querystring.stringify({
 			error: "state_mismatch"
 	}));
 	} 
@@ -216,57 +216,76 @@ app.get("/callback", function(req, res){
 
 				// use the access token to access the Spotify Web API
 				request.get(options, function(error, response, body){
-					console.log(body, "Spotify auth body");
+					//console.log(body, "Spotify auth body");
 
 					var spotifyUser = {};
-					spotifyUser.name = body.display_name;
-					spotifyUser.href = body.href;
+					spotifyUser.spotifyId = body.id;
+					spotifyUser.fullName = body.display_name;
 					spotifyUser.email = body.email;
-					spotifyUser.username = body.id;
+					spotifyUser.userUrl = body.href;
 					spotifyUser.imageUrl = body.images[0].url;
 
 					console.log(spotifyUser, "spotify user info I captured");
 
+					// findOneAndUpdate creates item(document) in database if it does not exist,
+					// and if it does exist, it updates the fields I'm adding here with the current
+					// ones I'm grabbing from the Spotify API
+					db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, function(err, user){
+						if(err){
+							console.log(err, "magical error");
+							res.render("errors/500");
+						} else{
+							console.log(user, "user in our db now");
+							res.redirect("/users/" + user._id);
+						}
+					})
+
 				});
 
-				// we can also pass the token to the browser to make requests from there
-				res.redirect("/#" + querystring.stringify({
-					access_token: access_token,
-					refresh_token: refresh_token
-				}));
-				} else {
-					res.redirect("/#" + querystring.stringify({
-						error: "invalid_token"
-				}));
-				}
+				// // res.redirect("/users/welcome");
+				// // we can also pass the token to the browser to make requests from there
+				// res.redirect("/users/welcome?" + querystring.stringify({
+				// 	access_token: access_token,
+				// 	refresh_token: refresh_token
+				// }));
+				// } else {
+				// 	res.redirect("/#" + querystring.stringify({
+				// 		error: "invalid_token"
+				// }));
+
+			}
 		});
 	}
 });
 
 // SPOTIFY - GET NEW TOKENS
-app.get('/refresh_token', function(req, res){
+// app.get('/refresh_token', function(req, res){
 
-	// requesting access token from refresh token
-	var refresh_token = req.query.refresh_token;
-	var authOptions = {
-		url: "https://accounts.spotify.com/api/token",
-		headers: { "Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64")) },
-		form: {
-			grant_type: "refresh_token",
-			refresh_token: refresh_token
-		},
-		json: true
-	};
+// 	// requesting access token from refresh token
+// 	var refresh_token = req.query.refresh_token;
+// 	var authOptions = {
+// 		url: "https://accounts.spotify.com/api/token",
+// 		headers: { "Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64")) },
+// 		form: {
+// 			grant_type: "refresh_token",
+// 			refresh_token: refresh_token
+// 		},
+// 		json: true
+// 	};
 
-	request.post(authOptions, function(error, response, body){
-		if (!error && response.statusCode === 200){
-			var access_token = body.access_token;
-			res.send({
-				"access_token": access_token
-			});
-		}
-	});
+// 	request.post(authOptions, function(error, response, body){
+// 		if (!error && response.statusCode === 200){
+// 			var access_token = body.access_token;
+// 			res.send({
+// 				"access_token": access_token
+// 			});
+// 		}
+// 	});
 
+// });
+
+app.get("/users/welcome", function(req, res){
+	res.render("users/welcome");
 });
 
 
@@ -280,10 +299,10 @@ app.get("/logout", function(req, res){
 
 // SHOW - GET "show"
 // show user's bio, friends, and playlists
-app.get("/users/:user_id", routeHelper.ensureSameUser, function(req, res){
+app.get("/users/:user_id", function(req, res){
 	db.User.findById(req.params.user_id, function(err, user){
 		if(err){
-			console.log(err);
+			console.log(err, "error in getting /users/:user_id route");
 			res.render("errors/500");
 		} else {
 			res.render("users/show", {user:user});
@@ -357,6 +376,12 @@ app.get("/play/computer", routeHelper.ensureSameUser, function(req, res){
 app.get("/play/:playlist_id", routeHelper.ensureSameUser, function(req, res){
 	// do stuff
 	res.render("rounds/play");
+});
+
+// 500 page - oopsie
+app.get("/errors/500", function(req, res){
+	console.log("in the /errors/500 - oopsie route")
+	res.render("errors/500");
 });
 
 // 404 page - oopsie

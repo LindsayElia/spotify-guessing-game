@@ -16,9 +16,11 @@ var routeHelpers = {
 		db.User.findById(req.params.user_id, function(err, user){
 			// console.log(typeof user._id);
 			// console.log(typeof req.session.id);
-			var userIdAsString = user._id.toString();
-			if(userIdAsString !== req.session.id){
-				res.redirect("/index");
+			// var userIdAsString = user._id.toString();
+			// if(userIdAsString !== req.session.id){
+			if(user._id != req.session.id){
+				console.log("error with routeHelper.ensureSameUser");
+				res.redirect("/errors/500");
 			} else {
 				return next();
 			}
