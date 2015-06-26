@@ -21,8 +21,9 @@ var client_id = process.env.SPOTIFY_CLIENT_ID;
 var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 // console.log(client_secret, "-- SPOTIFY_CLIENT_SECRET");
 
+// comment this out while using Passport
 // will need to edit this for production:
-var redirect_uri = "http://localhost:3000/callback";
+// var redirect_uri = "http://localhost:3000/callback";
 
 // SPOTIFY API REQUIRES THIS
 var request = require("request");
@@ -66,8 +67,42 @@ var generateRandomString = function(length) {
 
 var stateKey = 'spotify_auth_state';
 
+//______________PASSPORT-SPOTIFY MIDDLEWARE______________
+var passport = require("passport");
+app.use(passport.initialize());
+app.use(passport.session());
+var SpotifyStrategy = require("passport-spotify").Strategy;
+passport.use(new SpotifyStrategy({
+	clientID: client_id,			// my app's credentials
+    clientSecret: client_secret,	// my app's credentials
+    callbackURL: "http://localhost:3000/auth/spotify/callback"
+	},
+	function(accessToken, refreshToken, profile, done){
+		db.User.findOneAndUpdate({ username: profile.id }, function (err, user){
+			return done(err, user);
+		});
+	}
+));
+
 
 //______________ROUTES______________
+
+
+//_______PASSPORT-SPOTIFY ROUTES_______
+app.get("/auth/spotify", passport.authenticate("spotify", 
+	{scope : ["user-read-private", "user-read-email", "playlist-read-private", "playlist-modify-private", "user-follow-read", "user-follow-modify", "user-library-read"],
+		showDialog: true }),
+	function(req, res){
+		// The request will be redirected to spotify for authentication, 
+		// so this function will not be called.
+});
+
+app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedirect: '/login' }), 
+	function(req, res){
+		// Successful authentication, redirect to users/index.
+		res.redirect("/index");
+});
+
 
 //_______HOME_______
 
@@ -219,8 +254,8 @@ app.get("/callback", function(req, res){
 					console.log(body, "Spotify auth body");
 
 					var spotifyUser = {};
-					spotifyUser.name = body.display_name;
-					spotifyUser.href = body.href;
+					spotifyUser.fullName = body.display_name; // turn into fullName
+					spotifyUser.avatarUrl = body.href;	// turn into avatarUrl
 					spotifyUser.email = body.email;
 					spotifyUser.username = body.id;
 					spotifyUser.imageUrl = body.images[0].url;

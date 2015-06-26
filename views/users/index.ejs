@@ -7,11 +7,18 @@
 
 	<p>Index Users Page - HOME page - PUBLIC<p>
 
-<div class="border">
-	<h3>Sign up with email - simple login</h3>
-	<p>New? <a href="/signup"><button class="button">Signup</button></a></p>
-	<p>Have a 'simple' account? <a href="/login"><button class="button">Login Simple</button></a></p>
-</div>
+	<div class="border">
+		<h3>Sign up with email - simple login</h3>
+		<p>New? <a href="/signup"><button class="button">Signup</button></a></p>
+		<p>Have a 'simple' account? <a href="/login"><button class="button">Login Simple</button></a></p>
+	</div>
+
+	<div class="border">
+		<h3>Sign in using your Spotify Account</h3>
+	    
+	    <a href="/auth/spotify"><button class="button">Login with Spotify</button></a>
+
+	</div>
 
 <%  }  %>
 
@@ -25,7 +32,7 @@
 	<div class="border">
 		<h3>Sign in using your Spotify Account</h3>
 	    
-	    <a href="/login/spotify"><button class="button">Login with Spotify</button></a>
+	    <a href="/auth/spotify"><button class="button">Login with Spotify</button></a>
 
 	</div>
 
@@ -47,8 +54,6 @@
 	<a href="/play/computer"><button class="button">Play computer</button></a>
 	<a href=""><button class="button">Find friends</button></a>
 	<a href=""><button class="button">Create playlist</button></a>
-
-
 
 <%  }  %>
 

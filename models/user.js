@@ -7,22 +7,19 @@ var SALT_WORK_FACTOR = 10;
 
 //_______DEFINE USER SCHEMA_______
 var userSchema = new mongoose.Schema({
-	// username: {
-	// 	type: String,
-	// 	lowercase: true,
-	// 	required: true
-	// },
+	username: String,		// get from Spotify, id
+	fullName: String,		// get from Spotify, display_name
 	email: {
 		type: String,
-		lowercase: true,
+		lowercase: true,	// may not need to require these if using email from Spotify
 		required: true,
 		unique: true
 	},
-	password: {
+	password: {				// may omit password altogether if I use Passport
 		type: String,
 		required: true
 	},
-	avatarUrl: String,
+	avatarUrl: String,	// get from Spotify
 	genres: [],
 	numCorrect: Number,
 	numIncorrect: Number,
