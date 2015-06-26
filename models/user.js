@@ -19,6 +19,7 @@ var userSchema = new mongoose.Schema({
 	// 	type: String,
 	// 	required: true
 	// },
+	accessToken: String,
 	spotifyId: String,
 	fullName: String,
 	userUrl: String,
