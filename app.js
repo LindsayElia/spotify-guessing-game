@@ -147,13 +147,13 @@ app.get("/callback", function(req, res){
 
 					// use the access token to access the Spotify Web API
 					request.get(options, function(error, response, body){
-									//console.log(body, "Spotify auth body");
+									console.log(body, "Spotify auth body");
 									var spotifyUser = {};
 									spotifyUser.spotifyId = body.id;
 									spotifyUser.fullName = body.display_name;
 									spotifyUser.email = body.email;
 									spotifyUser.userUrl = body.href;
-									spotifyUser.imageUrl = body.images[0].url;
+									//spotifyUser.imageUrl = body.images[0].url;
 									spotifyUser.accessToken = access_token;
 
 									console.log(spotifyUser, "spotify user info I captured");
@@ -161,11 +161,16 @@ app.get("/callback", function(req, res){
 									// findOneAndUpdate creates item(document) in database if it does not exist,
 									// and if it does exist, it updates the fields I'm adding here with the current
 									// ones I'm grabbing from the Spotify API
-									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {upsert:true}, function(err, user){
-											if(err){ console.log(err, "magical error");
+									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
+											if(err){ 
+													console.log(err, "magical error");
 													res.redirect("/errors/500?" + querystring.stringify({error: "invalid_token"}));
-											} else { console.log(user, "user in our db now");
+											} else { 
+
 													req.login(access_token); // set the session id to the Spotify access_token for this user
+													console.log(user, "user in our db now, from inside findOneAndUpdate");
+													console.log(access_token, "access_token from inside findOneAndUpdate");
+													console.log(user.accessToken, "user accessToken from inside findOneAndUpdate");
 													res.redirect("/users/welcome?" + querystring.stringify({ access_token: access_token, refresh_token: refresh_token}));
 											}
 									});

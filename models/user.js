@@ -7,20 +7,23 @@ mongoose.set("debug", true);
 
 //_______DEFINE USER SCHEMA_______
 var userSchema = new mongoose.Schema({
-	email: String,
-	// email: {
-	// 	type: String,
+	//email: String,
+	email: {
+		type: String,
 	// 	lowercase: true,
 	// 	required: true,
-	// 	unique: true
-	// },
-	password: String,
+	 	unique: true
+	},
+	// password: String,
 	// password: {
 	// 	type: String,
 	// 	required: true
 	// },
 	accessToken: String,
-	spotifyId: String,
+	spotifyId: {
+		type: String,
+		unique: true
+	},
 	fullName: String,
 	userUrl: String,
 	imageUrl: String,

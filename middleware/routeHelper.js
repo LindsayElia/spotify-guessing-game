@@ -31,14 +31,17 @@ var routeHelpers = {
 
 	// check that access token in params matches access token in db
 	ensureSameSpotifyUser: function(req, res, next){
-		db.User.findOne({access_token:req.params.access_token}, function(err, user){
+		console.log(req.query.access_token, "access_token from params");
+		db.User.findOne({accessToken:req.query.access_token}, function(err, user){
+			console.log(user, "user we get from findOne");
 			if(user.accessToken != req.session.id){
 				console.log(user, "user we are logging inside of SameSpotifyUser");
-				console.log(user.accessToken, "user.access_token we are logging inside of SameSpotifyUser");
+				console.log(user.accessToken, "user.accessToken we are logging inside of SameSpotifyUser");
 				console.log(req.session.id, "req.session.id we are logging inside of SameSpotifyUser");
 				console.log("error with routeHelper.ensureSameSpotifyUser");
 				res.redirect("/errors/500");
 			} else {
+				console.log("saved with accessToken::: ", user.accessToken);
 				return next();
 			}
 		});
