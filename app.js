@@ -21,6 +21,9 @@ var client_id = process.env.SPOTIFY_CLIENT_ID;
 var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 // console.log(client_secret, "-- SPOTIFY_CLIENT_SECRET");
 
+// will need to edit this for production:
+var redirect_uri = "http://localhost:3000/callback";
+
 // SPOTIFY API REQUIRES THIS
 var request = require("request");
 var querystring = require("querystring");
@@ -213,7 +216,17 @@ app.get("/callback", function(req, res){
 
 				// use the access token to access the Spotify Web API
 				request.get(options, function(error, response, body){
-					console.log(body);
+					console.log(body, "Spotify auth body");
+
+					var spotifyUser = {};
+					spotifyUser.name = body.display_name;
+					spotifyUser.href = body.href;
+					spotifyUser.email = body.email;
+					spotifyUser.username = body.id;
+					spotifyUser.imageUrl = body.images[0].url;
+
+					console.log(spotifyUser, "spotify user info I captured");
+
 				});
 
 				// we can also pass the token to the browser to make requests from there
