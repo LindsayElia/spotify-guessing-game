@@ -10,6 +10,11 @@ var routeHelpers = {
 			res.redirect("/login");
 		}
 	},
+
+	// spotifyUserLoggedInContinue : function(req, res, next){
+	// 	if(req)
+	// },
+
 	
 	// check that user is logged in as a certain user
 	ensureSameUser: function(req, res, next){
@@ -26,6 +31,9 @@ var routeHelpers = {
 			}
 		});
 	},
+
+
+
 
 	// stop users from logging in more than once during a session
 	// don't let people logged in visit the login or the sign up page

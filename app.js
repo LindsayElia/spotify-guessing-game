@@ -179,84 +179,73 @@ app.get("/callback", function(req, res){
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
 
-	// if state is not set, go to 404 (?) page
-	if (state === null || state !== storedState) {
-		res.redirect("/404" + querystring.stringify({
-			error: "state_mismatch"
-	}));
-	} 
+	// if state is not set, go to 404 page
+	if (state === null || state !== storedState) {res.redirect("/404" + querystring.stringify({error: "state_mismatch"}));} 
+	
 	// if state is set, get tokens
-	else {
-		res.clearCookie(stateKey);
-		var authOptions = {
-			url: "https://accounts.spotify.com/api/token",
-			form: {
-				code: code,
-				redirect_uri: redirect_uri,
-				grant_type: "authorization_code"
-		},
-			headers: {
-				"Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64"))
-		},
-			json: true
-		};
+	else {res.clearCookie(stateKey);
+			var authOptions = { url: "https://accounts.spotify.com/api/token", 
+								form: { code: code, redirect_uri: redirect_uri, grant_type: "authorization_code" },
+								headers: {"Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64"))},
+								json: true
+			};
 
-		// make a POST request to the URL in authOptions
-		request.post(authOptions, function(error, response, body){
-			if (!error && response.statusCode === 200){
+	
+			// make a POST request to the URL in authOptions
+			request.post(authOptions, function(error, response, body){
+				if (!error && response.statusCode === 200){
+					var access_token = body.access_token, refresh_token = body.refresh_token;
+					var options = {
+									url: "https://api.spotify.com/v1/me",
+									headers: { "Authorization": "Bearer " + access_token },
+									json: true
+								  };
 
-				var access_token = body.access_token,
-					refresh_token = body.refresh_token;
+					// use the access token to access the Spotify Web API
+					request.get(options, function(error, response, body){
+									//console.log(body, "Spotify auth body");
+									var spotifyUser = {};
+									spotifyUser.spotifyId = body.id;
+									spotifyUser.fullName = body.display_name;
+									spotifyUser.email = body.email;
+									spotifyUser.userUrl = body.href;
+									spotifyUser.imageUrl = body.images[0].url;
 
-				var options = {
-					url: "https://api.spotify.com/v1/me",
-					headers: { "Authorization": "Bearer " + access_token },
-					json: true
-				};
+									console.log(spotifyUser, "spotify user info I captured");
 
-				// use the access token to access the Spotify Web API
-				request.get(options, function(error, response, body){
-					//console.log(body, "Spotify auth body");
+									// findOneAndUpdate creates item(document) in database if it does not exist,
+									// and if it does exist, it updates the fields I'm adding here with the current
+									// ones I'm grabbing from the Spotify API
+									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, function(err, user){
+											if(err){ console.log(err, "magical error");
+													res.redirect("/errors/500?" + querystring.stringify({error: "invalid_token"}));
+											} else { console.log(user, "user in our db now");
+													req.login(access_token); // set the session id to the Spotify access_token for this user
+													res.redirect("/users/welcome?" + querystring.stringify({ access_token: access_token, refresh_token: refresh_token}));
+											}
+									});
+					});
 
-					var spotifyUser = {};
-					spotifyUser.spotifyId = body.id;
-					spotifyUser.fullName = body.display_name;
-					spotifyUser.email = body.email;
-					spotifyUser.userUrl = body.href;
-					spotifyUser.imageUrl = body.images[0].url;
+		// the redirect below happens at the same time as, and independently of, the request to the Spotify API above
+		// the query string for the redirect containes both the access_token=... and the refresh_token=...
 
-					console.log(spotifyUser, "spotify user info I captured");
+						// // res.redirect("/users/welcome");
+						// // we can also pass the token to the browser to make requests from there
+						// res.redirect("/users/welcome?" + querystring.stringify({
+						// 	access_token: access_token,
+						// 	refresh_token: refresh_token
+						// }));
+						// } else {
+						// 	res.redirect("/#" + querystring.stringify({
+						// 		error: "invalid_token"
+						// }));
 
-					// findOneAndUpdate creates item(document) in database if it does not exist,
-					// and if it does exist, it updates the fields I'm adding here with the current
-					// ones I'm grabbing from the Spotify API
-					db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, function(err, user){
-						if(err){
-							console.log(err, "magical error");
-							res.render("errors/500");
-						} else{
-							console.log(user, "user in our db now");
-							res.redirect("/users/" + user._id);
-						}
-					})
+				}
+			});
 
-				});
-
-				// // res.redirect("/users/welcome");
-				// // we can also pass the token to the browser to make requests from there
-				// res.redirect("/users/welcome?" + querystring.stringify({
-				// 	access_token: access_token,
-				// 	refresh_token: refresh_token
-				// }));
-				// } else {
-				// 	res.redirect("/#" + querystring.stringify({
-				// 		error: "invalid_token"
-				// }));
-
-			}
-		});
 	}
 });
+
 
 // SPOTIFY - GET NEW TOKENS
 // app.get('/refresh_token', function(req, res){
