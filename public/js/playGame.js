@@ -38,7 +38,7 @@ $(function() {
 	$divUserInputGuess.hide();
 	$divSongResults.hide();
 	$divScore.hide();
-	$countdown.hide()
+	$countdown.hide();
 
 	// when "start" button/form is clicked, make request and play new song
 	$startGameForm.on("submit", function(event){		// why is on.submit not working, but on.click works?

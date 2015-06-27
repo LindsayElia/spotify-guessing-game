@@ -158,7 +158,7 @@ app.get("/callback", function(req, res){
 
 					// use the access token to access the Spotify Web API
 					request.get(options, function(error, response, body){
-									console.log(body, "Spotify auth body");
+									// console.log(body, "Spotify auth body");
 									var spotifyUser = {};
 									spotifyUser.spotifyId = body.id;
 									spotifyUser.fullName = body.display_name;
@@ -167,22 +167,25 @@ app.get("/callback", function(req, res){
 									spotifyUser.imageUrl = body.images[0].url;
 									spotifyUser.accessToken = access_token;
 
-									console.log(spotifyUser, "spotify user info I captured");
+									// console.log(spotifyUser, "spotify user info I captured");
 
 									// findOneAndUpdate creates item(document) in database if it does not exist,
 									// and if it does exist, it updates the fields I'm adding here with the current
 									// ones I'm grabbing from the Spotify API
 									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
+											console.log("request.get to spotify and findOneAndUpdate is running");
 											if(err){ 
 													console.log(err, "error saving user to database by SpotifyId");
 													res.redirect("/errors/500?" + querystring.stringify({error: "invalid_token"}));
 											} else { 
 
 													req.login(access_token); // set the session id to the Spotify access_token for this user
-													console.log(user, "user in our db now, from inside findOneAndUpdate");
-													console.log(access_token, "access_token from inside findOneAndUpdate");
-													console.log(user.accessToken, "user accessToken from inside findOneAndUpdate");
-													res.redirect("/users?" + querystring.stringify({ access_token: access_token, refresh_token: refresh_token, display_name: body.display_name, spotifyId: body.id }));
+													// console.log(user, "user in our db now, from inside findOneAndUpdate");
+													// console.log(access_token, "access_token from inside findOneAndUpdate");
+													// console.log(user.accessToken, "user accessToken from inside findOneAndUpdate");
+													var queryVar = querystring.stringify({ access_token: access_token, refresh_token: refresh_token, display_name: body.display_name, spotifyId: body.id });
+													// console.log(queryVar, "queryVar");
+													res.redirect("/users/redirect?" + queryVar);
 											}
 									});
 
@@ -191,7 +194,7 @@ app.get("/callback", function(req, res){
 													url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists",
 													headers: { "Authorization": "Bearer " + access_token },
 													json: true
-												  };
+									};
 
 									
 
@@ -200,12 +203,13 @@ app.get("/callback", function(req, res){
 										for(var i = 0; i < body.items.length; i++){
 											spotifyUser.playlistIds.push(body.items[i].id);
 										}
-										console.log(spotifyUser.playlistIds, "playlistsIds for current user");
+										// console.log(spotifyUser.playlistIds, "playlistsIds for current user");
 										db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
 											if(err){
-												console.log(err, "error saving playlists to database");
-											} else {;
-												console.log("playlists saved to database");
+												// console.log(err, "error saving playlists to database");
+											} else {
+												// console.log("playlists saved to database");
+												// console.log(body, "all playlist data in body response");
 											}
 										});
 
@@ -257,42 +261,59 @@ app.get("/logout", function(req, res){
 
 //_______USER ROUTES_______
 
+
+app.get("/users/redirect", routeHelper.ensureSameSpotifyUser, function(req, res){
+		res.redirect("/users/" + req.query.spotifyId);
+});
+
+
 // SHOW - GET "show"
 // show user's bio, friends, and playlists
-app.get("/users", routeHelper.ensureSameSpotifyUser, function(req, res){
-	db.User.findOne({spotifyId:req.query.spotifyId}, function(err, user){
+app.get("/users/:spotifyId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
+	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
+		// console.log("get /users findOne is running");
 		if(err){
 			console.log(err, "error in getting /users/:user_id route");
 			res.render("errors/500");
 		} else {
-			res.render("users/show", {user:user});
-		}
+			res.format({
+				"text/html": function(){
+					res.render("users/show", {user:user});
+				},
+				"application/json": function(){
+					res.send({user:user});
+				},
+				"default": function(){
+					res.status(406).send("Not an acceptable format for this page");
+				}
+			});
+		}		
 	});
 });
 
 // UPDATE - PUT "edit"
 // post updated/edited bio info & redirect to the users/show page
-app.put("/users/:user_id", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
+// app.put("/users/:user_id", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
 
-	var userUpdates = {};
-	userUpdates.avatarUrl = req.body.userAvatarUrl;
-//	userUpdates.genres.push(req.body.userGenres); 
-// having trouble updating the genres array here
+// 	var userUpdates = {};
+// 	userUpdates.avatarUrl = req.body.userAvatarUrl;
+// //	userUpdates.genres.push(req.body.userGenres); 
+// // having trouble updating the genres array here
 
-	db.User.findByIdAndUpdate(req.params.user_id, userUpdates, function(err, user){
-		if(err){
-			console.log(err);
-			res.render("errors/500");
-		} else {
-			res.redirect("/users/" + user._id);
-		}
-	});
-});
+// 	db.User.findByIdAndUpdate(req.params.user_id, userUpdates, function(err, user){
+// 		if(err){
+// 			console.log(err);
+// 			res.render("errors/500");
+// 		} else {
+// 			res.redirect("/users/" + user._id);
+// 		}
+// 	});
+// });
 
 // EDIT - GET "edit"
 // show form to edit user's bio
-app.get("/users/:user_id/edit", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	db.User.findById(req.params.user_id, function(err, user){
+app.get("/users/:spotifyId/edit", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
+	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
 		if(err){
 			console.log(err);
 			res.render("errors/500");

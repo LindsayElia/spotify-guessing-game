@@ -1,6 +1,7 @@
 <!-- display a single user's bio & game info -->
 <% include ../partials/header %>
 
+
 <div>Logged in currently as <%= user.fullName %> </div>
 <p>"SHOW" page for single user</p>
 
@@ -13,12 +14,22 @@
 </div>
 
 
-<p>show player friends</p>
+<p>show user's friends</p>
+<div id="showFriends">
+</div>
 
+<p>show user's playlists</p>
+<div>
+	<ul id="showPlaylists"></ul>
+</div>
+
+<form>
+	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
+</form>
 
 <div>Logged in currently as <%= user.fullName %> </div>
 <div>
-	<a href="/users/<%= user._id %>/edit"><button class="button">Edit user info</button></a>
+	<a href="/users/<%= user.spotifyId %>/edit"><button class="button">Edit user info</button></a>
 	<a href="/logout"><button class="button logout">Logout</button></a>
 </div>
 

@@ -5,7 +5,7 @@ var loginHelpers = function(req, res, next){
 	// Spotify login - set the session id to be the access token from spotify
 	req.login = function(access_token){
 		req.session.id = access_token;
-		console.log(req.session.id, "req.session.id set to this");
+		// console.log(req.session.id, "req.session.id set to this");
 	};
 
 	// set session id to null
@@ -19,9 +19,6 @@ var loginHelpers = function(req, res, next){
 };
 
 module.exports = loginHelpers;
-
-
-
 
 
 

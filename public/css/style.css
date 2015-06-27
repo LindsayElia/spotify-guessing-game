@@ -30,7 +30,7 @@ body {
 	font-size: 1em;
 }
 
-ul {
+ul, li {
 	list-style: none;
 }
 
