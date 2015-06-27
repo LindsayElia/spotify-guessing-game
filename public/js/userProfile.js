@@ -15,7 +15,7 @@ $(function() {
 			console.log(dataRcvd, "logging spotify user data from ajax get");
 	});
 
-	$userProfileDiv.append("<p>hello</p>");
+	//$userProfileDiv.append("<p>hello</p>");
 
 
 }); // close $ wrapper

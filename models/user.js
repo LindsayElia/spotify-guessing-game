@@ -27,6 +27,7 @@ var userSchema = new mongoose.Schema({
 	fullName: String,
 	userUrl: String,
 	imageUrl: String,
+	followersHref: String,
 	genres: [],
 	numCorrect: Number,
 	numIncorrect: Number,
@@ -37,10 +38,7 @@ var userSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User"
 	}],
-	playlists: [{
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "Playlist"
-	}],
+	playlistIds: [],
 	rounds: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Round"

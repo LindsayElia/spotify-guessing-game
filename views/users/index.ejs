@@ -19,43 +19,32 @@
 	</div>
 
 
+	<div class="border">
+		<p>This will display the scores for all players when NOT logged in.</p>
+	</div>
 
 <%  }  %>
 
 
 <% if(req.session.id !== null && req.session.id !== undefined){  %>
 
-	<p>Index Users Page - HOME page - LOGGED IN<p>
-
-	<div>Logged in currently as ____<%=  %>____ </div>
-
+	<p>Welcome! You are now logged in. <p>
 
 	<div class="border" id="userProfileDiv">
+		
+		<p>Logged in currently as <%= req.query.display_name %></p>
+
 	</div>
 
 	<div>
 		
-		<a href="/users/<%= req.session.id %>"><button class="button">Go to 'show' user page</button></a>
-		<a href="/users/<%= req.session.id %>/edit"><button class="button">Edit user info</button></a>
+		<a href="/users/<%= req.query.spotifyId %>"><button class="button">Continue</button></a>
 		<a href="/logout"><button class="button logout">Logout</button></a>
 	</div>
-
-	<p>Player page for single user</p>
-	<p>"show" player's info</p>
-	<p>show player friends</p>
-
-	<p>Or, you can play against the computer, find friends to play against, or create a playlist to challenge friends with.</p>
-	<a href="/play/computer"><button class="button">Play computer</button></a>
-	<a href=""><button class="button">Find friends</button></a>
-	<a href=""><button class="button">Create playlist</button></a>
-
 
 
 <%  }  %>
 
-	<div class="border">
-		<p>This will display the scores for all players & shows whether or not you are logged in.</p>
-	</div>
 
 
 <!-- bring in custom js scripts for this page -->
