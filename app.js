@@ -157,14 +157,14 @@ app.get("/callback", function(req, res){
 								  };
 
 					// use the access token to access the Spotify Web API
-					request.get(options, function(error, response, body){
-									// console.log(body, "Spotify auth body");
+					request.get(options, function(error, response, userBody){
+									// console.log(userBody, "Spotify auth body");
 									var spotifyUser = {};
-									spotifyUser.spotifyId = body.id;
-									spotifyUser.fullName = body.display_name;
-									spotifyUser.email = body.email;
-									spotifyUser.userUrl = body.href;
-									spotifyUser.imageUrl = body.images[0].url;
+									spotifyUser.spotifyId = userBody.id;
+									spotifyUser.fullName = userBody.display_name;
+									spotifyUser.email = userBody.email;
+									spotifyUser.userUrl = userBody.href;
+									spotifyUser.imageUrl = userBody.images[0].url;
 									spotifyUser.accessToken = access_token;
 
 									// console.log(spotifyUser, "spotify user info I captured");
@@ -189,31 +189,67 @@ app.get("/callback", function(req, res){
 											}
 									});
 
-									// get other info about the user & save to our db
+									// get playlist info for this user
 									var optionsPlaylist = {
 													url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists",
 													headers: { "Authorization": "Bearer " + access_token },
 													json: true
 									};
 
-									
-
+									// save each playlist Id into an array on the spotifyUser model
+									spotifyUser.playlistIds = [];
 									request.get(optionsPlaylist, function(error, response, body){
-										spotifyUser.playlistIds = [];
 										for(var i = 0; i < body.items.length; i++){
 											spotifyUser.playlistIds.push(body.items[i].id);
 										}
-										// console.log(spotifyUser.playlistIds, "playlistsIds for current user");
-										db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
-											if(err){
-												// console.log(err, "error saving playlists to database");
-											} else {
-												// console.log("playlists saved to database");
-												// console.log(body, "all playlist data in body response");
-											}
-										});
-
 									});
+									// console.log(spotifyUser.playlistIds, "playlistsIds for current user");
+
+
+									// update the user in the user database
+									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
+										if(err){
+											// console.log(err, "error saving playlists to database");
+										} else {
+											// console.log("playlists saved to database");
+											// console.log(body, "all playlist data in body response");
+										}
+									});
+
+
+									// get tracks for each playlist
+									var spotifyPlaylist = {};
+									spotifyPlaylist.playlistId = ;
+									spotifyPlaylist.trackIds = [];
+
+									var optionsPlaylistTrack = {
+											url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists/" + body.items[i].id + "/tracks",
+											headers: { "Authorization": "Bearer " + access_token },
+											json: true,
+											fields: "items(track(name,href,album(name,href)))"
+										};
+
+									// save each track Id into an array on the playlist model
+									
+
+
+									// find all songs in playlist & save to trackIds array
+												request.get(optionsPlaylistTrack, function(error, response, body){
+													console.log(body.items, "body response from playlist tracks option");
+													// if playlist is empty, do nothing, otherwise save tracks in trackIds array
+														for (var t = 0; t < body.items.length; t++){
+															if (body.items !== []){
+																trackIds.push(body.items[t].track.id);
+																console.log(trackIds, "this trackId");
+															}
+														}
+													
+												});
+
+												// find playlist in database and save trackIds array to it
+												db.Playlist.findOneAndUpdate({playlistIds})
+
+									
 
 					});
 

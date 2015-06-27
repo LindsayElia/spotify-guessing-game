@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 mongoose.set("debug", true);
 
-var songSchema = new mongoose.Schema({
+var trackSchema = new mongoose.Schema({
 	title: String,
 	artist: String,  // multiple artists would still be a string so I don't need an array 
 	// unless I want to be able to search by artist?
@@ -11,5 +11,5 @@ var songSchema = new mongoose.Schema({
 	fullSpotifyUrl: String
 });
 
-var Song = mongoose.model("Song", songSchema);
-module.exports = Song;
+var Track = mongoose.model("Track", trackSchema);
+module.exports = Track;

@@ -61,7 +61,7 @@ $(function() {
 			console.log(status);
 			console.log(dataRcvd);
 			dataSpotify = dataRcvd;
-			console.log("trying to capture just preview URL: " + dataSpotify.preview_url)
+			console.log("trying to capture just preview URL: " + dataSpotify.preview_url);
 			// put song preview URL in as the source for the audio element
 
 // !!!!
