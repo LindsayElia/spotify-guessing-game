@@ -31,6 +31,10 @@ var request = require("request");
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 
+// module request-wrapper for Spotify API
+var SpotifyWebApi = require('spotify-web-api-node');
+
+
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
@@ -134,128 +138,140 @@ app.get("/callback", function(req, res){
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
 
 	// if state is not set, go to 404 page
-	if (state === null || state !== storedState) {res.redirect("/404" + querystring.stringify({error: "state_mismatch"}));} 
+	if (state === null || state !== storedState) {
+		res.redirect("/404" + querystring.stringify({error: "state_mismatch"}));
+	} 
 	
 	// if state is set, get tokens
-	else {res.clearCookie(stateKey);
-			var authOptions = { url: "https://accounts.spotify.com/api/token", 
-								form: { code: code, redirect_uri: redirect_uri, grant_type: "authorization_code" },
-								headers: {"Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64"))},
+	else {
+		res.clearCookie(stateKey);
+
+		// make a POST request with the token
+		var authOptions = { 
+							url: "https://accounts.spotify.com/api/token", 
+							form: { code: code, redirect_uri: redirect_uri, grant_type: "authorization_code" },
+							headers: {"Authorization": "Basic " + (new Buffer(client_id + ":" + client_secret).toString("base64"))},
+							json: true
+						  };
+		
+		request.post(authOptions, function(error, response, body){
+			if (!error && response.statusCode === 200){
+
+				var access_token = body.access_token;
+				var refresh_token = body.refresh_token;
+				var options = {
+								url: "https://api.spotify.com/v1/me",
+								headers: { "Authorization": "Bearer " + access_token },
 								json: true
-			};
+							  };
 
-	
-			// make a POST request to the URL in authOptions
-			request.post(authOptions, function(error, response, body){
-				if (!error && response.statusCode === 200){
-					var access_token = body.access_token;
-					var refresh_token = body.refresh_token;
-					var options = {
-									url: "https://api.spotify.com/v1/me",
-									headers: { "Authorization": "Bearer " + access_token },
-									json: true
-								  };
+				// use the access token to access the Spotify Web API
+				request.get(options, function(error, response, userBody){
+					// console.log(userBody, "Spotify auth body");
+					var spotifyUser = {};
+					spotifyUser.spotifyId = userBody.id;
+					spotifyUser.fullName = userBody.display_name;
+					spotifyUser.email = userBody.email;
+					spotifyUser.userUrl = userBody.href;
+					spotifyUser.imageUrl = userBody.images[0].url;
+					spotifyUser.accessToken = access_token;
 
-					// use the access token to access the Spotify Web API
-					request.get(options, function(error, response, userBody){
-									// console.log(userBody, "Spotify auth body");
-									var spotifyUser = {};
-									spotifyUser.spotifyId = userBody.id;
-									spotifyUser.fullName = userBody.display_name;
-									spotifyUser.email = userBody.email;
-									spotifyUser.userUrl = userBody.href;
-									spotifyUser.imageUrl = userBody.images[0].url;
-									spotifyUser.accessToken = access_token;
+					// console.log(spotifyUser, "spotify user info I captured");
 
-									// console.log(spotifyUser, "spotify user info I captured");
+					// findOneAndUpdate creates item(document) in database if it does not exist,
+					// and if it does exist, it updates the fields I'm adding here with the current
+					// ones I'm grabbing from the Spotify API
+					db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
+							console.log("request.get to spotify and findOneAndUpdate is running");
+							if(err){ 
+									console.log(err, "error saving user to database by SpotifyId");
+									res.redirect("/errors/500?" + querystring.stringify({error: "invalid_token"}));
+							} else { 
 
-									// findOneAndUpdate creates item(document) in database if it does not exist,
-									// and if it does exist, it updates the fields I'm adding here with the current
-									// ones I'm grabbing from the Spotify API
-									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
-											console.log("request.get to spotify and findOneAndUpdate is running");
-											if(err){ 
-													console.log(err, "error saving user to database by SpotifyId");
-													res.redirect("/errors/500?" + querystring.stringify({error: "invalid_token"}));
-											} else { 
+									req.login(access_token); // set the session id to the Spotify access_token for this user
+									// console.log(user, "user in our db now, from inside findOneAndUpdate");
+									// console.log(access_token, "access_token from inside findOneAndUpdate");
+									// console.log(user.accessToken, "user accessToken from inside findOneAndUpdate");
+									var queryVar = querystring.stringify({ access_token: access_token, refresh_token: refresh_token, display_name: body.display_name, spotifyId: body.id });
+									console.log(queryVar, "queryVar");
+									res.redirect("/users/redirect?" + queryVar);
+							}
 
-													req.login(access_token); // set the session id to the Spotify access_token for this user
-													// console.log(user, "user in our db now, from inside findOneAndUpdate");
-													// console.log(access_token, "access_token from inside findOneAndUpdate");
-													// console.log(user.accessToken, "user accessToken from inside findOneAndUpdate");
-													var queryVar = querystring.stringify({ access_token: access_token, refresh_token: refresh_token, display_name: body.display_name, spotifyId: body.id });
-													// console.log(queryVar, "queryVar");
-													res.redirect("/users/redirect?" + queryVar);
-											}
-									});
 
-									// get playlist info for this user
-									var optionsPlaylist = {
-													url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists",
-													headers: { "Authorization": "Bearer " + access_token },
-													json: true
-									};
+							// get playlist info for this user
+							var optionsPlaylist = {
+											url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists",
+											headers: { "Authorization": "Bearer " + access_token },
+											json: true
+							};
 
-									// save each playlist Id into an array on the spotifyUser model
-									spotifyUser.playlistIds = [];
-									request.get(optionsPlaylist, function(error, response, body){
-										for(var i = 0; i < body.items.length; i++){
-											spotifyUser.playlistIds.push(body.items[i].id);
-										}
-									});
+							
+							spotifyUser.playlistIds = [];
+
+							// save each playlist Id into an array on the spotifyUser model
+							request.get(optionsPlaylist, function(error, response, playlistBody){
+
+								for(var i = 0; i < playlistBody.items.length; i++){
+
+									spotifyUser.playlistIds.push(playlistBody.items[i].id);
 									// console.log(spotifyUser.playlistIds, "playlistsIds for current user");
 
-
-									// update the user in the user database
+									// update the user in the user database with the playlistIds array	
 									db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new:true, upsert:true}, function(err, user){
 										if(err){
-											// console.log(err, "error saving playlists to database");
+											console.log(err, "error saving playlists to user database");
 										} else {
-											// console.log("playlists saved to database");
-											// console.log(body, "all playlist data in body response");
+											console.log("playlists saved to user database");
+											console.log(spotifyUser, "this is the user data being saved/updated");
 										}
-									});
+									});	
 
-
-									// get tracks for each playlist
-									var spotifyPlaylist = {};
-									spotifyPlaylist.playlistId = ;
-									spotifyPlaylist.trackIds = [];
-
-									var optionsPlaylistTrack = {
-											url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists/" + body.items[i].id + "/tracks",
-											headers: { "Authorization": "Bearer " + access_token },
-											json: true,
-											fields: "items(track(name,href,album(name,href)))"
-										};
 
 									// save each track Id into an array on the playlist model
-									
+									var optionsPlaylistTrack = {
+										url: "https://api.spotify.com/v1/users/" + spotifyUser.spotifyId + "/playlists/" + playlistBody.items[i].id + "/tracks",
+										headers: { "Authorization": "Bearer " + access_token },
+										json: true,
+										fields: "items(track(name,href,album(name,href)))"
+									};
 
+									var spotifyPlaylist = {};
+									spotifyPlaylist.playlistId = playlistBody.items[i].id;
+									spotifyPlaylist.trackIds = [];
 
-									// find all songs in playlist & save to trackIds array
-												request.get(optionsPlaylistTrack, function(error, response, body){
-													console.log(body.items, "body response from playlist tracks option");
-													// if playlist is empty, do nothing, otherwise save tracks in trackIds array
-														for (var t = 0; t < body.items.length; t++){
-															if (body.items !== []){
-																trackIds.push(body.items[t].track.id);
-																console.log(trackIds, "this trackId");
-															}
-														}
-													
-												});
+									// find all songs in playlist & save to trackIds array for that playlist
+									request.get(optionsPlaylistTrack, function(error, response, trackBody){
+										console.log(trackBody.items, "trackBody response from playlist tracks option");
+										// if playlist is empty, do nothing, otherwise save tracks in trackIds array
+											for (var t = 0; t < trackBody.items.length; t++){
+												if (trackBody.items !== []){
+													spotifyPlaylist.trackIds.push(trackBody.items[t].track.id);
+													console.log(spotifyPlaylist.trackIds, "this trackId");
+												}
+											}
+										
+										// add/update the playlist in the playlist database with the tracksId array
+										db.Playlist.findOneAndUpdate({playlistIds:spotifyPlaylist.playlistId}, spotifyPlaylist, {new:true, upsert:true}, function(err, playlist){
+											if(err){
+												console.log(err, "error saving tracksId to playlist database");
+											} else {
+												console.log("tracks saved to playlist database");
+												console.log(spotifyPlaylist, "this is the spotifyPlaylist being saved/updated");
+											}
+										});
 
-												// find playlist in database and save trackIds array to it
-												db.Playlist.findOneAndUpdate({playlistIds})
+									});	
 
-									
+								}
 
-					});
+							});			
 
-					
-				}
-			});
+					});		
+
+				});
+				
+			}
+		});
 
 	}
 });
