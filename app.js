@@ -182,7 +182,7 @@ app.get('/callback', function(req, res) {
 				        			console.log("error saving user to database on callback from API", err);
 				        			res.redirect("/errors/500?" + querystring.stringify({error:"invalid_token"}));
 				        		} else {
-
+				        			// set user cookie to be access token and redirect user to user's show page
 				        			req.login(access_token);
 				        			res.redirect('/users/redirect?' +
 				        							querystring.stringify({
@@ -193,23 +193,17 @@ app.get('/callback', function(req, res) {
 				        						}));
 				        		}
 				        	}); // close db.User.findOneAndUpdate...
-
-			        		
-
-// would be nice to refactor this out so we don't have to make nested requests to spotify
-// I tried but spotifyId was showing as undefined
-				        	// make a request to spotify API to get playlists for current user
-							// spotifyApi.getUserPlaylists(spotifyUser.spotifyId)
-							// 	.then(function(data){
-							// 		console.log("retrieved playlists for this user: ", spotifyUser.spotifyId, data.body);
-							// 	}), function(err){
-							// 		console.log("something went wrong with getUserPlaylists: ", err);
-							// 	};
-
-
+				        	return spotifyUser.spotifyId;
 			        	})
+						.then(function(spotifyUserId){
+				        	// make a request to spotify API to get playlists for current user
+							 return spotifyApi.getUserPlaylists(spotifyUserId);
+						})
+						.then(function(playlistData){
+							console.log("users' playlists??: ", playlistData.body);
+						})
 			        	.catch(function(err){
-			        		console.log("something went wrong with spotifyApi.getMe(): ", err.message);	
+			        		console.log("something went wrong - error message is: ", err.message);	
 			        	}); // close spotifyApi.getMe()
 
 
