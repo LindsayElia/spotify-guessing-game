@@ -68,7 +68,7 @@ var generateRandomString = function(length) {
 
 var stateKey = 'spotify_auth_state';
 
-var authorizationCode;
+//var authorizationCode;
 
 // ROUTES FOR GETTING AN ACCESS TOKEN / CODE / authorizationCode FROM SPOTIFY
 
@@ -95,7 +95,7 @@ app.get('/callback', function(req, res) {
 	// my application requests refresh and access tokens
 	// after checking the state parameter
 
-	authorizationCode = req.query.code || null;
+	var authorizationCode = req.query.code || null;
 	console.log("special code", authorizationCode);
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
@@ -106,7 +106,8 @@ app.get('/callback', function(req, res) {
 		querystring.stringify({
 			error: 'state_mismatch'
 		}));
-	} else {
+	} 
+	else {
 
 	    	res.clearCookie(stateKey);
 
@@ -136,66 +137,108 @@ app.get('/callback', function(req, res) {
 				        	json: true
 			        		};
 
+			        // save my credentials to the spotify-web-api-node wrapper object
+			        // so we can use it instead of request.get
+			        // since it has promises like .then() etc
+					var spotifyApi = new SpotifyWebApi({
+						clientId : client_id,
+						clientSecret : client_secret,
+						redirectUri : redirect_uri,
+						accessToken : access_token
+					});		
+
+					// var spotifyUser;      
+
 			        // use the access token to access the Spotify Web API
-			        request.get(options, function(error, response, body) {
-			        	console.log(body);
 
-			        	var spotifyUser = {};
-			        	spotifyUser.spotifyId = body.id;
-			        	console.log("spotify user id: ", spotifyUser.spotifyId);
-			        	spotifyUser.accessToken = access_token;
+			        // make a request to Spotify API to get data for current user
+			        spotifyApi.getMe()
+			        	.then(function(data){
 
-// add more properties to user here once I get this working again
+			        		return data;
+			        	})
+			        	.then(function(data){
+			        		console.log("body of request to https://api.spotify.com/v1/me: ", data.body);
 
-			        	db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new: true, upsert: true}, function(err, user){
-			        		if(err){
-			        			console.log("error saving user to database on callback from API", err);
-			        			res.redirect("/errors/500?" + querystring.stringify({error:"invalid_token"}));
-			        		} else {
+			        		// assign the API body response for the user to the user object we'll save
+				        	// into our database
+				        	var spotifyUser = {};
+				        	spotifyUser.spotifyId = data.body.id;
+				        	console.log("spotify user id: ", spotifyUser.spotifyId);
+				        	spotifyUser.accessToken = access_token;
+				        	spotifyUser.fullName = data.body.display_name;
+				        	spotifyUser.email = data.body.email;
+				        	spotifyUser.userUrl = data.body.href;
+				        	spotifyUser.imageUrl = data.body.images[0].url;
 
-			        			req.login(access_token);
-			        			res.redirect('/users/redirect?' +
-			        							querystring.stringify({
-			        								access_token: access_token,
-			        								refresh_token: refresh_token,
-			        								display_name: body.display_name, 
-			        								spotifyId: body.id
-			        						}));
-			        		}
-			        	});
+				        	console.log("hello");
+				        	console.log("spotifyUser again? : ", spotifyUser);
+				        	return spotifyUser;
+				        })
+				        .then(function(spotifyUser){
+				        	// save user in user database and redirect to /users/redirect?querystring...
+				        	db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new: true, upsert: true}, function(err, user){
+				        		if(err){
+				        			console.log("error saving user to database on callback from API", err);
+				        			res.redirect("/errors/500?" + querystring.stringify({error:"invalid_token"}));
+				        		} else {
+
+				        			req.login(access_token);
+				        			res.redirect('/users/redirect?' +
+				        							querystring.stringify({
+				        								access_token: access_token,
+				        								refresh_token: refresh_token,
+				        								display_name: body.display_name, 
+				        								spotifyId: spotifyUser.spotifyId
+				        						}));
+				        		}
+				        	}); // close db.User.findOneAndUpdate...
+
+			        		
+
+// would be nice to refactor this out so we don't have to make nested requests to spotify
+// I tried but spotifyId was showing as undefined
+				        	// make a request to spotify API to get playlists for current user
+							// spotifyApi.getUserPlaylists(spotifyUser.spotifyId)
+							// 	.then(function(data){
+							// 		console.log("retrieved playlists for this user: ", spotifyUser.spotifyId, data.body);
+							// 	}), function(err){
+							// 		console.log("something went wrong with getUserPlaylists: ", err);
+							// 	};
 
 
-			        });
-			  
-				}
+			        	})
+			        	.catch(function(err){
+			        		console.log("something went wrong with spotifyApi.getMe(): ", err.message);	
+			        	}); // close spotifyApi.getMe()
+
+
+				} // close if (!error...)
 				
-			});
+			}); // close request.post(authOptions...)
 
-	} // close first 'if'
+		//	return authorizationCode;	// saving in case we want to use outside of this function
 
-});
+	} // close 'else'
 
-// save my credentials to the spotify-web-api-node wrapper object
-var spotifyApi = new SpotifyWebApi({
-	clientId : client_id,
-	clientSecret : client_secret,
-	redirectUri : redirect_uri,
-});
 
-spotifyApi.authorizationCodeGrant(authorizationCode)
-	.then(function(data){
-		console.log("Retrieved access token: ", data.body["access_token"]);
+}); // close app.get "/callback"
 
-		// set the access token
 
-	});
+
+
+
+
+
+
+
 
 
 
 //______________ROUTES______________
 
 
-app.get("/welcom", function(req, res){
+app.get("/welcome", function(req, res){
 	res.render("users/welcome");
 });
 
