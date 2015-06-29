@@ -268,7 +268,7 @@ app.get('/callback', function(req, res) {
 							//var spotifyUserId = playlistsArray.body.items[0].owner.id;
 							console.log("playlistsArray with user id at first index: ", playlistsArray);
 							var spotifyId = playlistsArray.shift();
-							console.log("hiiiii spotify id for three - ", spotifyId);
+							// console.log("hiiiii spotify id for three - ", spotifyId);
 							var playlistIds = playlistsArray;
 							console.log("spotifyId: ", spotifyId);
 							console.log("playlistIds: ", playlistIds);
@@ -389,7 +389,7 @@ app.get("/users/:spotifyId", routeHelper.ensureSameSpotifyUserLoggedIn, function
 	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
 		// console.log("get /users findOne is running");
 		if(err){
-			console.log(err, "error in getting /users/:user_id route");
+			console.log(err, "error in getting /users/:spotifyId route");
 			res.render("errors/500");
 		} else {
 			res.format({
@@ -448,10 +448,26 @@ app.get("/playlists/new", routeHelper.ensureSameSpotifyUserLoggedIn, function(re
 	res.render("playlists/new");
 });
 
-// EDIT - GET "edit"
-// edit an existing playlist
-app.get("/playlists/:playlist_id", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	res.render("playlists/edit");
+// SHOW playlist info
+app.get("/playlists/:playlistId", function(req, res){
+	db.Playlist.findOne({playlistId:req.params.playlistId}, function(err, playlist){
+		if(err){
+			console.log(err, "error in getting /users/:spotifyId/playlists route");
+			res.render("errors/500");
+		} else {
+			res.format({
+				"text/html": function(){
+					res.render("users/show", {playlist:playlist});
+				},
+				"application/json": function(){
+					res.send({playlist:playlist});
+				},
+				"default": function(){
+					res.status(406).send("Not an acceptable format for this page");
+				}
+			});
+		}
+	});
 });
 
 // SHOW - POST to users/show
