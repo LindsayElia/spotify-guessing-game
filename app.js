@@ -17,7 +17,7 @@ var cookieParser = require("cookie-parser");
 
 // module spotify-web-api-node for Spotify API
 var SpotifyWebApi = require('spotify-web-api-node');
-
+console.log(typeof SpotifyWebApi, " -- type of SpotifyWebApi");
 
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
@@ -96,7 +96,7 @@ app.get('/callback', function(req, res) {
 	// after checking the state parameter
 
 	var authorizationCode = req.query.code || null;
-	console.log("special code", authorizationCode);
+	// console.log("special code", authorizationCode);
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
 
@@ -129,7 +129,7 @@ app.get('/callback', function(req, res) {
 				if (!error && response.statusCode === 200) {
 
 			        var access_token = body.access_token;
-			        console.log("access token!!! : ", access_token);
+			        // console.log("access token!!! : ", access_token);
 					var refresh_token = body.refresh_token;
 			        var options = {
 				        	url: 'https://api.spotify.com/v1/me',
@@ -156,28 +156,28 @@ app.get('/callback', function(req, res) {
 			        		return data;
 			        	})
 			        	.then(function(data){
-			        		console.log("body of request to https://api.spotify.com/v1/me: ", data.body);
+			        		// console.log("body of request to https://api.spotify.com/v1/me: ", data.body);
 
 			        		// assign the API body response for the user to the user object we'll save
 				        	// into our database
 				        	var spotifyUser = {};
 				        	spotifyUser.spotifyId = data.body.id;
-				        	console.log("spotify user id: ", spotifyUser.spotifyId);
+				        	// console.log("spotify user id: ", spotifyUser.spotifyId);
 				        	spotifyUser.accessToken = access_token;
 				        	spotifyUser.fullName = data.body.display_name;
 				        	spotifyUser.email = data.body.email;
 				        	spotifyUser.userUrl = data.body.href;
 				        	spotifyUser.imageUrl = data.body.images[0].url;
 
-				        	console.log("hello");
-				        	console.log("spotifyUser again? : ", spotifyUser);
+				        	// console.log("hello");
+				        	// console.log("spotifyUser again? : ", spotifyUser);
 				        	return spotifyUser;
 				        })
 				        .then(function(spotifyUser){
 				        	// save user in user database and redirect to /users/redirect?querystring...
 				        	db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new: true, upsert: true}, function(err, user){
 				        		if(err){
-				        			console.log("error saving user to database on callback from API", err); // should I be using err.message instead of just err ?
+				        			console.log("error saving user to database on callback from API", err.message);
 				        			res.redirect("/errors/500?" + querystring.stringify({error:"invalid_token"}));
 				        		} else {
 				        			// set user cookie to be access token and redirect user to user's show page
@@ -199,37 +199,44 @@ app.get('/callback', function(req, res) {
 				        	return spotifyApi.getUserPlaylists(spotifyUserId, {limit:50});
 						})
 						.then(function(playlistData){
-							console.log("all playlist data: ", playlistData.body);
-							console.log("playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
-							console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
-							console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
-							console.log("playlist 3 of 3: ", playlistData.body.items[2].id);
+							// console.log("all playlist data: ", playlistData.body);
+							// console.log("playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
+							// console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
+							// console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
+							// console.log("playlist 3 of 3: ", playlistData.body.items[2].id);
 
 							var playlistsArray = [playlistData.body.items[0].owner.id];
 							for (var i = 0; i < playlistData.body.items.length; i++){
 								playlistsArray.push(playlistData.body.items[i].id);
-								console.log("user id + playlists now in playlistsArray array: ", playlistsArray);
+								// console.log("user id + playlists now in playlistsArray array: ", playlistsArray);
 							}
 							return playlistsArray;
 						})
 						.then(function(playlistsArray){
-							console.log("new function returning playlistsArray: ", playlistsArray);
+							// console.log("new function returning playlistsArray: ", playlistsArray);
 							var user = {};
 							user.spotifyId = playlistsArray.shift();
 							user.playlistIds = playlistsArray;
 							// save playlist Ids to user in user database
 							db.User.findOneAndUpdate({spotifyId:user.spotifyId}, user, {new: true, upsert: true}, function(err, user){
 								if(err){
-									console.log("error saving playlists array to user: ", err); // should I be using err.message instead of just err ?
+									console.log("error saving playlists array to user: ", err.message);
 								} else {
-									console.log("user object: ", user);
+									// console.log("user object: ", user);
+									console.log("playlist ids added to user - success");
 								}
 							}); // close db.User.findOneAndUpdate...
+							// put the user id back into the playlist array so we have it later
+							playlistsArray.unshift(user.spotifyId);
+							// console.log("playlist array back together again: ", playlistsArray);
 							return playlistsArray;
 						})
 						.then(function(playlistsArray){
 							// save playlist ids to playlist database
 							// for each item in playlistsArray, save it as the playlistId for a new Playlist document
+
+// saving user id as a playlist for now...can remove & re-add later if I want to
+
 							for (var i = 0; i < playlistsArray.length; i++){
 								var playlist = {};
 								playlist.playlistId = playlistsArray[i];
@@ -237,10 +244,56 @@ app.get('/callback', function(req, res) {
 										if(err){
 											console.log("error saving playlist to playlists database", err.message);
 										} else {
-											console.log("playlist saved to playlist database: ", playlist);
+											// console.log("playlist saved to playlist database: ", playlist);
+											console.log("playlist ids saved to playlist database - success");
 										}
 								}); // close db.Playlist.findOneAndUpdate...
 							} // close for loop
+							return playlistsArray;
+						})
+						.then(function(playlistsArray){
+							//var spotifyUserId = playlistsArray.body.items[0].owner.id;
+							console.log("playlistsArray with user id at first index: ", playlistsArray);
+							var spotifyId = playlistsArray.shift();
+							var playlistIds = playlistsArray;
+							console.log("spotifyId: ", spotifyId);
+							console.log("playlistIds: ", playlistIds);
+
+
+							// get track info for each playlist, up to the first 10 tracks in a playlist
+							// for (var p = 0; p < playlistIds; p++){
+							// 	// make an array for each playlist to hold the track ids
+							// 	var thisTrack = playlistIds[p];
+							// } // close earlier for loop
+							
+							var thisTrack = playlistIds[0];
+							var allPlaylistsWithTracksArray = [];
+							var playlistArrayForTracks = [];
+							spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:10}, function(err, data){
+								 if (err) {
+								    console.error('Something went wrong - ', err.message);
+								  } else {
+								    console.log("data.body.items: ", data.body.items);
+								    for(var t = 0; t < data.body.items.length; t++){
+								    	var trackName = data.body.items[t].album.name;
+								    	console.log("data.body.items[t].album.name -->>> ", trackName);
+								    	// console.log("data.body.items[t].album.id -->>> ", data.body.items[t].album.id);
+
+								    	playlistArrayForTracks.push(data.body.items[t]);
+								    }
+								  }
+								console.log("playlistArrayForTracks: ", playlistArrayForTracks);
+							});
+							
+							
+							
+							// playlistArrayForTracks.push(result);
+								
+							
+							// allPlaylistsWithTracksArray.push(playlistArrayForTracks);
+							// allPlaylistsWithTracksArray.push(" spacer ");
+							// console.log("allPlaylistsWithTracksArray:.............. ", allPlaylistsWithTracksArray);
+
 						})
 			        	.catch(function(err){
 			        		console.log("something went wrong - error message is: ", err.message);	
