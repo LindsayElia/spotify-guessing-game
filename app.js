@@ -281,7 +281,7 @@ app.get('/callback', function(req, res) {
 								var thisTrack = playlist.playlistId;
 								// console.log("hiiiii - thisTrack: ", thisTrack);
 								var playlistArrayForTracks = [];
-								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:10}, function(err, data){
+								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:100}, function(err, data){
 									if(err){
 										console.log("seriously?");
 										console.log("something went wrong - error message is: ", err.message);	
