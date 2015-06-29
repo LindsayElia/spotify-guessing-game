@@ -31,7 +31,7 @@ $(function() {
 								$showPlaylists.append("<ul><li>Playlist: " + 
 								playlistData.playlist.playlistName + 
 								"</li><li># of songs: " + playlistData.playlist.trackIds.length +
-								"</li><li><a href=''><button class='button'>Pick Me</button></a></li></ul>");		
+								"</li><li><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId +"'><button class='button'>Pick Me</button></a></li></ul>");		
 							}
 						})
 						.fail(function(){

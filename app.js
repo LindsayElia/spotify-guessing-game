@@ -454,7 +454,7 @@ app.get("/playlists/new", routeHelper.ensureSameSpotifyUserLoggedIn, function(re
 app.get("/playlists/:playlistId", function(req, res){
 	db.Playlist.findOne({playlistId:req.params.playlistId}, function(err, playlist){
 		if(err){
-			console.log(err, "error in getting /users/:spotifyId/playlists route");
+			console.log(err, "error in getting /playlists/:playlistId route");
 			res.render("errors/500");
 		} else {
 			res.format({
@@ -488,9 +488,26 @@ app.get("/play/computer", routeHelper.ensureSameSpotifyUserLoggedIn, function(re
 });
 
 // PLAY - GET "play" - play computer
-app.get("/play/:playlist_id", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	// do stuff
-	res.render("rounds/play");
+app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
+	console.log("getting /users/:spotifyId/play/:playlistId");
+	db.Playlist.findOne({playlistId:req.params.playlistId}, function(err, playlist){
+		if(err){
+			console.log(err, "error in getting /play/:playlistId route");
+			res.render("errors/500");
+		} else {
+			res.format({
+				"text/html": function(){
+					res.render("rounds/play", {playlist:playlist});
+				},
+				"application/json": function(){
+					res.send({playlist:playlist});
+				},
+				"default": function(){
+					res.status(406).send("Not an acceptable format for this page");
+				}
+			});
+		}
+	});
 });
 
 // 500 page - oopsie
