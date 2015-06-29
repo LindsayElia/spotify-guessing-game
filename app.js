@@ -217,8 +217,7 @@ app.get('/callback', function(req, res) {
 							var user = {};
 							user.spotifyId = playlistsArray.shift();
 							user.playlistIds = playlistsArray;
-							
-						
+							// save playlist Ids to user in user database
 							db.User.findOneAndUpdate({spotifyId:user.spotifyId}, user, {new: true, upsert: true}, function(err, user){
 								if(err){
 									console.log("error saving playlists array to user: ", err); // should I be using err.message instead of just err ?
@@ -226,6 +225,22 @@ app.get('/callback', function(req, res) {
 									console.log("user object: ", user);
 								}
 							}); // close db.User.findOneAndUpdate...
+							return playlistsArray;
+						})
+						.then(function(playlistsArray){
+							// save playlist ids to playlist database
+							// for each item in playlistsArray, save it as the playlistId for a new Playlist document
+							for (var i = 0; i < playlistsArray.length; i++){
+								var playlist = {};
+								playlist.playlistId = playlistsArray[i];
+								db.Playlist.findOneAndUpdate({playlistId:playlist.playlistId}, playlist, {new: true, upsert: true}, function(err, playlist){
+										if(err){
+											console.log("error saving playlist to playlists database", err.message);
+										} else {
+											console.log("playlist saved to playlist database: ", playlist);
+										}
+								}); // close db.Playlist.findOneAndUpdate...
+							} // close for loop
 						})
 			        	.catch(function(err){
 			        		console.log("something went wrong - error message is: ", err.message);	
