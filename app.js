@@ -199,23 +199,32 @@ app.get('/callback', function(req, res) {
 				        	return spotifyApi.getUserPlaylists(spotifyUserId, {limit:50});
 						})
 						.then(function(playlistData){
-							// console.log("all playlist data: ", playlistData.body);
+							console.log("all playlist data: ", playlistData.body);
 							// console.log("playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
 							// console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
 							// console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
 							// console.log("playlist 3 of 3: ", playlistData.body.items[2].id);
 
-							var playlistsArray = [playlistData.body.items[0].owner.id];
+							var playlistsArray = [{
+								playlistId: playlistData.body.items[0].owner.id,
+								playlistName: "ownerOfThisPlaylistArray"
+								}];
+
 							for (var i = 0; i < playlistData.body.items.length; i++){
-								playlistsArray.push(playlistData.body.items[i].id);
+								playlistsArray.push({
+									playlistId: playlistData.body.items[i].id,
+									playlistName: playlistData.body.items[i].name
+									});
 								// console.log("user id + playlists now in playlistsArray array: ", playlistsArray);
 							}
+
 							return playlistsArray;
 						})
 						.then(function(playlistsArray){
 							// console.log("new function returning playlistsArray: ", playlistsArray);
 							var user = {};
-							user.spotifyId = playlistsArray.shift();
+							user.spotifyId = playlistsArray.shift().playlistId;
+							// console.log("hiiiiiii user.spotifyId", user.spotifyId);
 							user.playlistIds = playlistsArray;
 							// save playlist Ids to user in user database
 							db.User.findOneAndUpdate({spotifyId:user.spotifyId}, user, {new: true, upsert: true}, function(err, user){
@@ -239,7 +248,7 @@ app.get('/callback', function(req, res) {
 
 							for (var i = 0; i < playlistsArray.length; i++){
 								var playlist = {};
-								playlist.playlistId = playlistsArray[i];
+								playlist.playlistId = playlistsArray[i].playlistId;
 								db.Playlist.findOneAndUpdate({playlistId:playlist.playlistId}, playlist, {new: true, upsert: true}, function(err, playlist){
 										if(err){
 											console.log("error saving playlist to playlists database - ", err.message);
@@ -249,6 +258,7 @@ app.get('/callback', function(req, res) {
 										}
 								}); // close db.Playlist.findOneAndUpdate...
 							} // close for loop
+
 							return playlistsArray;
 						})
 
@@ -258,6 +268,7 @@ app.get('/callback', function(req, res) {
 							//var spotifyUserId = playlistsArray.body.items[0].owner.id;
 							console.log("playlistsArray with user id at first index: ", playlistsArray);
 							var spotifyId = playlistsArray.shift();
+							console.log("hiiiii spotify id for three - ", spotifyId);
 							var playlistIds = playlistsArray;
 							console.log("spotifyId: ", spotifyId);
 							console.log("playlistIds: ", playlistIds);
@@ -265,10 +276,12 @@ app.get('/callback', function(req, res) {
 							var allPlaylistsWithTracksArray = [];
 							return playlistIds.forEach(function(playlist){
 								// get track info for each playlist, up to the first 10 tracks in a playlist
-								var thisTrack = playlist;
+								var thisTrack = playlist.playlistId;
+								// console.log("hiiiii - thisTrack: ", thisTrack);
 								var playlistArrayForTracks = [];
 								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:10}, function(err, data){
 									if(err){
+										console.log("seriously?");
 										console.log("something went wrong - error message is: ", err.message);	
 									}
 									else if (data.body.total !== 0) {
@@ -292,7 +305,7 @@ app.get('/callback', function(req, res) {
 													if(err){
 														console.log("error saving playlistTracks to playlists database - ", err.message);
 													} else {
-														console.log("playlistTracks saved to playlists database: ", playlistTracks);
+														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
 														console.log("playlistTracks saved to playlist database - success");
 													}
 											}); // close db.Playlist.findOneAndUpdate...
@@ -308,7 +321,7 @@ app.get('/callback', function(req, res) {
 
 						}) // close previous .then()
 			        	.catch(function(err){
-			        		console.log("something went wrong - error message is: ", err.message);	
+			        		console.log("something went wrong in .catch - error message is: ", err.message);	
 			        	}); // close spotifyApi.getMe()
 
 
