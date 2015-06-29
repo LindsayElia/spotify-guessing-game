@@ -12,6 +12,8 @@ $(function() {
 						"4I3YxhCTk88ClnlBbtDaK0",
 						"7DUoFVzdG9bQ2kOmdRjCj9"];
 
+	var songsArrayReplacement = [];
+
 	// global variables
 	var currentSong;
 	var counter = 0;

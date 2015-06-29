@@ -70,6 +70,7 @@ var stateKey = 'spotify_auth_state';
 
 //var authorizationCode;
 
+
 // ROUTES FOR GETTING AN ACCESS TOKEN / CODE / authorizationCode FROM SPOTIFY
 
 app.get('/login/spotify', function(req, res) {
@@ -99,7 +100,6 @@ app.get('/callback', function(req, res) {
 	// console.log("special code", authorizationCode);
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
-
 
 	if (state === null || state !== storedState) {
 		res.redirect('/404' +
@@ -137,17 +137,19 @@ app.get('/callback', function(req, res) {
 				        	json: true
 			        		};
 
-			        // save my credentials to the spotify-web-api-node wrapper object
-			        // so we can use it instead of request.get
-			        // since it has promises like .then() etc
+					// use the access token to access the Spotify Web API
+
+					// save my credentials to the spotify-web-api-node wrapper object
+					// so we can use it instead of request.get
+					// since it has promises like .then() etc
 					var spotifyApi = new SpotifyWebApi({
 						clientId : client_id,
 						clientSecret : client_secret,
 						redirectUri : redirect_uri,
 						accessToken : access_token
-					});		
+					});		        
 
-			        // use the access token to access the Spotify Web API
+// start the request for data from Spotify API
 
 			        // make a request to Spotify API to get data for current user
 			        spotifyApi.getMe()
@@ -156,6 +158,7 @@ app.get('/callback', function(req, res) {
 			        		return data;
 			        	})
 			        	.then(function(data){
+// format the data how we want it, for saving in our db
 			        		// console.log("body of request to https://api.spotify.com/v1/me: ", data.body);
 
 			        		// assign the API body response for the user to the user object we'll save
@@ -174,7 +177,8 @@ app.get('/callback', function(req, res) {
 				        	return spotifyUser;
 				        })
 				        .then(function(spotifyUser){
-				        	// save user in user database and redirect to /users/redirect?querystring...
+// save user in user database and redirect user to load their show page
+							// redirect to to /users/redirect?querystring...
 				        	db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new: true, upsert: true}, function(err, user){
 				        		if(err){
 				        			console.log("error saving user to database on callback from API", err.message);
@@ -195,11 +199,12 @@ app.get('/callback', function(req, res) {
 				        	return spotifyUserId;
 			        	})
 						.then(function(spotifyUserId){
-				        	// make a request to spotify API to get playlists for current user
+// get playlists for current user
 				        	return spotifyApi.getUserPlaylists(spotifyUserId, {limit:50});
 						})
 						.then(function(playlistData){
-							console.log("all playlist data: ", playlistData.body);
+// format the data how we want it, for saving in our db
+							// console.log("all playlist data: ", playlistData.body);
 							// console.log("playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
 							// console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
 							// console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
@@ -221,6 +226,7 @@ app.get('/callback', function(req, res) {
 							return playlistsArray;
 						})
 						.then(function(playlistsArray){
+// save playlists in user database
 							// console.log("new function returning playlistsArray: ", playlistsArray);
 							var user = {};
 							user.spotifyId = playlistsArray.shift().playlistId;
@@ -241,10 +247,11 @@ app.get('/callback', function(req, res) {
 							return playlistsArray;
 						})
 						.then(function(playlistsArray){
+// save playlists in playlist database
 							// save playlist ids to playlist database
 							// for each item in playlistsArray, save it as the playlistId for a new Playlist document
 
-// saving user id as a playlist for now...can remove & re-add later if I want to
+	// EDIT LATER - saving user id as a playlist for now...can remove & re-add later if I want to
 
 							for (var i = 0; i < playlistsArray.length; i++){
 								var playlist = {};
@@ -267,13 +274,14 @@ app.get('/callback', function(req, res) {
 //************
 
 						.then(function(playlistsArray){
+// get tracks for all playlists for current user
 							//var spotifyUserId = playlistsArray.body.items[0].owner.id;
-							console.log("playlistsArray with user id at first index: ", playlistsArray);
+							// console.log("playlistsArray with user id at first index: ", playlistsArray);
 							var spotifyId = playlistsArray.shift();
 							// console.log("hiiiii spotify id for three - ", spotifyId);
 							var playlistIds = playlistsArray;
-							console.log("spotifyId: ", spotifyId);
-							console.log("playlistIds: ", playlistIds);
+							// console.log("spotifyId: ", spotifyId);
+							// console.log("playlistIds: ", playlistIds);
 
 							var allPlaylistsWithTracksArray = [];
 							return playlistIds.forEach(function(playlist){
@@ -281,6 +289,7 @@ app.get('/callback', function(req, res) {
 								var thisTrack = playlist.playlistId;
 								// console.log("hiiiii - thisTrack: ", thisTrack);
 								var playlistArrayForTracks = [];
+// get track info for all tracks
 								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:100}, function(err, data){
 									if(err){
 										console.log("seriously?");
@@ -289,18 +298,38 @@ app.get('/callback', function(req, res) {
 									else if (data.body.total !== 0) {
 										    // console.log("data.body NOT items: ", data.body);
 										    for(var t = 0; t < data.body.items.length; t++){
+// first, save just the track name and track id to an object
+// to be saved in playlists database
 										    	var trackInfo = {
 										    		title: data.body.items[t].track.name,
 										    		trackId: data.body.items[t].track.id
 										    	};
-										    	// console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
-										    	playlistArrayForTracks.push(trackInfo);
-										    } // close for loop
-										    console.log("playlistArrayForTracks: ", playlistArrayForTracks);
-											
+										    	console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
+										    	
+// second, save all track info to an object
+// to be saved in tracks database
+										  //   	var trackInfoAll = {
+										  //   		trackId: data.body.items[u].track.id,
+										  //   		playlistId: thisTrack,
+										  //   		spotifyId: spotifyId,
+										  //   		title: data.body.items[u].track.name,
+										  //   		artist: data.body.items[u].track.album.artists, //this is an array
+										  //   		album: data.body.items[u].track.album.name,
+										  //   		artworkUrl: data.body.items[u].track.album.images[1].url,
+										  //   		previewUrl: data.boty.items[u].track.preview_url,
+										  //   		fullSpotifyUrl: data.body.items[u].track.external_urls.spotify,
+										  //   	};
+										  //   	console.log("trackInfo >>> ", trackInfo);
+												// console.log("this trackInfoAll >>> ", trackInfoAll);
+												
+												playlistArrayForTracks.push(trackInfo);
 
-											// save track names and track ids in the playlists database for each playlist id
-											console.log("thisTrack: ", thisTrack);
+
+										    } // close for loop
+										    // console.log("playlistArrayForTracks: ", playlistArrayForTracks);				
+											console.log("thisTrack thisTrack thisTrack thisTrack: ", thisTrack);
+											
+// save track names and track ids in the playlists database for each playlist id
 											var playlistTracks = {};
 											playlistTracks.trackIds = playlistArrayForTracks;
 											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
@@ -308,9 +337,14 @@ app.get('/callback', function(req, res) {
 														console.log("error saving playlistTracks to playlists database - ", err.message);
 													} else {
 														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
-														console.log("playlistTracks saved to playlist database - success");
+														console.log("playlistTracks saved to playlist database - success");	
 													}
 											}); // close db.Playlist.findOneAndUpdate...
+
+
+											// console.log("data.body.items TRACK ALBUM ", data.body.items[3]);
+										   
+
 
 									} // close else if
 										
@@ -497,6 +531,12 @@ app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserL
 		} else {
 			res.format({
 				"text/html": function(){
+				// grab track info out of our db when we load this page
+					
+
+
+
+
 					res.render("rounds/play", {playlist:playlist});
 				},
 				"application/json": function(){

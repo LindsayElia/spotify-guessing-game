@@ -2,9 +2,11 @@ var mongoose = require("mongoose");
 mongoose.set("debug", true);
 
 var trackSchema = new mongoose.Schema({
+	trackId: String,
+	playlistId: String,
+	spotifyId: String,
 	title: String,
-	artist: String,  // multiple artists would still be a string so I don't need an array 
-	// unless I want to be able to search by artist?
+	artist: Array,  // spotify sends this out as an array
 	album: String,
 	artworkUrl: String,
 	previewUrl: String,
