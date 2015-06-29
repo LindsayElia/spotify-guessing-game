@@ -242,7 +242,7 @@ app.get('/callback', function(req, res) {
 								playlist.playlistId = playlistsArray[i];
 								db.Playlist.findOneAndUpdate({playlistId:playlist.playlistId}, playlist, {new: true, upsert: true}, function(err, playlist){
 										if(err){
-											console.log("error saving playlist to playlists database", err.message);
+											console.log("error saving playlist to playlists database - ", err.message);
 										} else {
 											// console.log("playlist saved to playlist database: ", playlist);
 											console.log("playlist ids saved to playlist database - success");
@@ -251,6 +251,9 @@ app.get('/callback', function(req, res) {
 							} // close for loop
 							return playlistsArray;
 						})
+
+//************
+
 						.then(function(playlistsArray){
 							//var spotifyUserId = playlistsArray.body.items[0].owner.id;
 							console.log("playlistsArray with user id at first index: ", playlistsArray);
@@ -259,42 +262,51 @@ app.get('/callback', function(req, res) {
 							console.log("spotifyId: ", spotifyId);
 							console.log("playlistIds: ", playlistIds);
 
-
-							// get track info for each playlist, up to the first 10 tracks in a playlist
-							// for (var p = 0; p < playlistIds; p++){
-							// 	// make an array for each playlist to hold the track ids
-							// 	var thisTrack = playlistIds[p];
-							// } // close earlier for loop
-							
-							var thisTrack = playlistIds[0];
 							var allPlaylistsWithTracksArray = [];
-							var playlistArrayForTracks = [];
-							spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:10}, function(err, data){
-								 if (err) {
-								    console.error('Something went wrong - ', err.message);
-								  } else {
-								    console.log("data.body.items: ", data.body.items);
-								    for(var t = 0; t < data.body.items.length; t++){
-								    	var trackName = data.body.items[t].album.name;
-								    	console.log("data.body.items[t].album.name -->>> ", trackName);
-								    	// console.log("data.body.items[t].album.id -->>> ", data.body.items[t].album.id);
+							return playlistIds.forEach(function(playlist){
+								// get track info for each playlist, up to the first 10 tracks in a playlist
+								var thisTrack = playlist;
+								var playlistArrayForTracks = [];
+								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:10}, function(err, data){
+									if(err){
+										console.log("something went wrong - error message is: ", err.message);	
+									}
+									else if (data.body.total !== 0) {
+										    // console.log("data.body NOT items: ", data.body);
+										    for(var t = 0; t < data.body.items.length; t++){
+										    	var trackInfo = {
+										    		title: data.body.items[t].track.name,
+										    		trackId: data.body.items[t].track.id
+										    	};
+										    	// console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
+										    	playlistArrayForTracks.push(trackInfo);
+										    } // close for loop
+										    console.log("playlistArrayForTracks: ", playlistArrayForTracks);
+											
 
-								    	playlistArrayForTracks.push(data.body.items[t]);
-								    }
-								  }
-								console.log("playlistArrayForTracks: ", playlistArrayForTracks);
-							});
-							
-							
-							
-							// playlistArrayForTracks.push(result);
+											// save track names and track ids in the playlists database for each playlist id
+											console.log("thisTrack: ", thisTrack);
+											var playlistTracks = {};
+											playlistTracks.trackIds = playlistArrayForTracks;
+											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
+													if(err){
+														console.log("error saving playlistTracks to playlists database - ", err.message);
+													} else {
+														console.log("playlistTracks saved to playlists database: ", playlistTracks);
+														console.log("playlistTracks saved to playlist database - success");
+													}
+											}); // close db.Playlist.findOneAndUpdate...
+
+									} // close else if
+										
+								}); // spotifyApi.getPlaylistTracks...
 								
-							
-							// allPlaylistsWithTracksArray.push(playlistArrayForTracks);
-							// allPlaylistsWithTracksArray.push(" spacer ");
-							// console.log("allPlaylistsWithTracksArray:.............. ", allPlaylistsWithTracksArray);
 
-						})
+							}); // playlistIds.forEach(...
+
+//************
+
+						}) // close previous .then()
 			        	.catch(function(err){
 			        		console.log("something went wrong - error message is: ", err.message);	
 			        	}); // close spotifyApi.getMe()
@@ -310,14 +322,6 @@ app.get('/callback', function(req, res) {
 
 
 }); // close app.get "/callback"
-
-
-
-
-
-
-
-
 
 
 
