@@ -27,15 +27,16 @@ $(function() {
 						.done(function(playlistData, status){
 							console.log(playlistData, "data inside of /playlists/:playlistId call");
 
-							x = i + 1;
-							$showPlaylists.append("<ul><li>Playlist #" + x + ": " + 
-							playlistData.playlistName + 
-							"</li><li># of songs: " + playlistData.playlist.trackIds.length +
-							"</li><li><a href=''><button class='button'>Pick Me</button></a></li></ul>");
-							})
-							.fail(function(){
-								console.log("error with ajax request to playlist database");
-							});
+							if (playlistData.playlist.trackIds.length > 0) {
+								$showPlaylists.append("<ul><li>Playlist: " + 
+								playlistData.playlist.playlistName + 
+								"</li><li># of songs: " + playlistData.playlist.trackIds.length +
+								"</li><li><a href=''><button class='button'>Pick Me</button></a></li></ul>");		
+							}
+						})
+						.fail(function(){
+							console.log("error with ajax request to playlist database");
+						});
 				} // close for loop
 
 			}) // close first .done

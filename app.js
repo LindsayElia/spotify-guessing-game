@@ -226,7 +226,7 @@ app.get('/callback', function(req, res) {
 							user.spotifyId = playlistsArray.shift().playlistId;
 							// console.log("hiiiiiii user.spotifyId", user.spotifyId);
 							user.playlistIds = playlistsArray;
-							// save playlist Ids to user in user database
+							// save playlist Ids to user in user database (both playlist ids and names)
 							db.User.findOneAndUpdate({spotifyId:user.spotifyId}, user, {new: true, upsert: true}, function(err, user){
 								if(err){
 									console.log("error saving playlists array to user: ", err.message);
@@ -249,6 +249,8 @@ app.get('/callback', function(req, res) {
 							for (var i = 0; i < playlistsArray.length; i++){
 								var playlist = {};
 								playlist.playlistId = playlistsArray[i].playlistId;
+								playlist.playlistName = playlistsArray[i].playlistName;
+								// console.log("playlist trying to save id and name: ", playlist);
 								db.Playlist.findOneAndUpdate({playlistId:playlist.playlistId}, playlist, {new: true, upsert: true}, function(err, playlist){
 										if(err){
 											console.log("error saving playlist to playlists database - ", err.message);
