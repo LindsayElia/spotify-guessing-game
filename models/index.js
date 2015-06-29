@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 
 // will need to add an OR option once I host this
-mongoose.connect("mongodb://localhost/spotify_guessing_game_app");
+mongoose.connect("process.env.MONGOLAB_URI || mongodb://localhost/spotify_guessing_game_app");
 
 mongoose.set("debug", true);
 
