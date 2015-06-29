@@ -329,17 +329,17 @@ app.get('/callback', function(req, res) {
 										    // console.log("playlistArrayForTracks: ", playlistArrayForTracks);				
 											console.log("thisTrack thisTrack thisTrack thisTrack: ", thisTrack);
 											
-// save track names and track ids in the playlists database for each playlist id
-											var playlistTracks = {};
-											playlistTracks.trackIds = playlistArrayForTracks;
-											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
-													if(err){
-														console.log("error saving playlistTracks to playlists database - ", err.message);
-													} else {
-														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
-														console.log("playlistTracks saved to playlist database - success");	
-													}
-											}); // close db.Playlist.findOneAndUpdate...
+// // save track names and track ids in the playlists database for each playlist id
+// 											var playlistTracks = {};
+// 											playlistTracks.trackIds = playlistArrayForTracks;
+// 											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
+// 													if(err){
+// 														console.log("error saving playlistTracks to playlists database - ", err.message);
+// 													} else {
+// 														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
+// 														console.log("playlistTracks saved to playlist database - success");	
+// 													}
+// 											}); // close db.Playlist.findOneAndUpdate...
 
 
 											// console.log("data.body.items TRACK ALBUM ", data.body.items[3]);
