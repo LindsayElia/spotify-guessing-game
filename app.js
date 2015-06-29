@@ -147,8 +147,6 @@ app.get('/callback', function(req, res) {
 						accessToken : access_token
 					});		
 
-					// var spotifyUser;      
-
 			        // use the access token to access the Spotify Web API
 
 			        // make a request to Spotify API to get data for current user
@@ -179,7 +177,7 @@ app.get('/callback', function(req, res) {
 				        	// save user in user database and redirect to /users/redirect?querystring...
 				        	db.User.findOneAndUpdate({spotifyId:spotifyUser.spotifyId}, spotifyUser, {new: true, upsert: true}, function(err, user){
 				        		if(err){
-				        			console.log("error saving user to database on callback from API", err);
+				        			console.log("error saving user to database on callback from API", err); // should I be using err.message instead of just err ?
 				        			res.redirect("/errors/500?" + querystring.stringify({error:"invalid_token"}));
 				        		} else {
 				        			// set user cookie to be access token and redirect user to user's show page
@@ -192,15 +190,42 @@ app.get('/callback', function(req, res) {
 				        								spotifyId: spotifyUser.spotifyId
 				        						}));
 				        		}
-				        	}); // close db.User.findOneAndUpdate...
-				        	return spotifyUser.spotifyId;
+				        	}); // close db.User.findOneAndUpdate...;
+				        	var spotifyUserId = spotifyUser.spotifyId;
+				        	return spotifyUserId;
 			        	})
 						.then(function(spotifyUserId){
 				        	// make a request to spotify API to get playlists for current user
-							 return spotifyApi.getUserPlaylists(spotifyUserId);
+				        	return spotifyApi.getUserPlaylists(spotifyUserId, {limit:50});
 						})
 						.then(function(playlistData){
-							console.log("users' playlists??: ", playlistData.body);
+							console.log("all playlist data: ", playlistData.body);
+							console.log("playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
+							console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
+							console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
+							console.log("playlist 3 of 3: ", playlistData.body.items[2].id);
+
+							var playlistsArray = [playlistData.body.items[0].owner.id];
+							for (var i = 0; i < playlistData.body.items.length; i++){
+								playlistsArray.push(playlistData.body.items[i].id);
+								console.log("user id + playlists now in playlistsArray array: ", playlistsArray);
+							}
+							return playlistsArray;
+						})
+						.then(function(playlistsArray){
+							console.log("new function returning playlistsArray: ", playlistsArray);
+							var user = {};
+							user.spotifyId = playlistsArray.shift();
+							user.playlistIds = playlistsArray;
+							
+						
+							db.User.findOneAndUpdate({spotifyId:user.spotifyId}, user, {new: true, upsert: true}, function(err, user){
+								if(err){
+									console.log("error saving playlists array to user: ", err); // should I be using err.message instead of just err ?
+								} else {
+									console.log("user object: ", user);
+								}
+							}); // close db.User.findOneAndUpdate...
 						})
 			        	.catch(function(err){
 			        		console.log("something went wrong - error message is: ", err.message);	
