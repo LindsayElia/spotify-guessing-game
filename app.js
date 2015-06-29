@@ -52,7 +52,8 @@ var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 
 // _______EDIT LATER_______
 // will need to edit this for production:
-var redirect_uri = "http://localhost:3000/callback";
+// var redirect_uri = "http://localhost:3000/callback";		// development URL
+var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
 
 
 // Generates a random string containing numbers and letters
@@ -321,7 +322,7 @@ app.get('/callback', function(req, res) {
 										  //   	};
 										  //   	console.log("trackInfo >>> ", trackInfo);
 												// console.log("this trackInfoAll >>> ", trackInfoAll);
-												
+
 												playlistArrayForTracks.push(trackInfo);
 
 
