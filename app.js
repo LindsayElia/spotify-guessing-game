@@ -52,8 +52,8 @@ var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 
 // _______EDIT LATER_______
 // will need to edit this for production:
-// var redirect_uri = "http://localhost:3000/callback";		// development URL
-var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
+var redirect_uri = "http://localhost:3000/callback";		// development URL
+// var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
 
 
 // Generates a random string containing numbers and letters
@@ -101,6 +101,7 @@ app.get('/callback', function(req, res) {
 	// console.log("special code", authorizationCode);
 	var state = req.query.state || null;
 	var storedState = req.cookies ? req.cookies[stateKey] : null;
+	console.log("storedState: ", storedState);
 
 	if (state === null || state !== storedState) {
 		res.redirect('/404' +
@@ -272,6 +273,10 @@ app.get('/callback', function(req, res) {
 							return playlistsArray;
 						})
 
+
+
+
+
 //************
 
 						.then(function(playlistsArray){
@@ -279,7 +284,7 @@ app.get('/callback', function(req, res) {
 							//var spotifyUserId = playlistsArray.body.items[0].owner.id;
 							// console.log("playlistsArray with user id at first index: ", playlistsArray);
 							var spotifyId = playlistsArray.shift();
-							// console.log("hiiiii spotify id for three - ", spotifyId);
+							console.log("hiiiii spotify id for three - ", spotifyId);
 							var playlistIds = playlistsArray;
 							// console.log("spotifyId: ", spotifyId);
 							// console.log("playlistIds: ", playlistIds);
@@ -290,57 +295,66 @@ app.get('/callback', function(req, res) {
 								var thisTrack = playlist.playlistId;
 								// console.log("hiiiii - thisTrack: ", thisTrack);
 								var playlistArrayForTracks = [];
+								var anotherArray = [];
+								var trackInfo;
+								var trackInfoAll;
 // get track info for all tracks
 								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:100}, function(err, data){
 									if(err){
 										console.log("seriously?");
 										console.log("something went wrong - error message is: ", err.message);	
 									}
+									
 									else if (data.body.total !== 0) {
-										    // console.log("data.body NOT items: ", data.body);
+										console.log("all data.body.totalss ", data.body);
+										    console.log("data.body NOT/YES items: ", data.body.items);
 										    for(var t = 0; t < data.body.items.length; t++){
+
+										    	console.log("counting data.body.items.tracks...[t]", data.body.items[t]);
 // first, save just the track name and track id to an object
 // to be saved in playlists database
-										    	var trackInfo = {
+										    	trackInfo = {
 										    		title: data.body.items[t].track.name,
 										    		trackId: data.body.items[t].track.id
 										    	};
-										    	console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
-										    	
+										    	console.log("trackInfo >>> 1 >>> ", trackInfo);
 // second, save all track info to an object
 // to be saved in tracks database
-										  //   	var trackInfoAll = {
-										  //   		trackId: data.body.items[u].track.id,
-										  //   		playlistId: thisTrack,
-										  //   		spotifyId: spotifyId,
-										  //   		title: data.body.items[u].track.name,
-										  //   		artist: data.body.items[u].track.album.artists, //this is an array
-										  //   		album: data.body.items[u].track.album.name,
-										  //   		artworkUrl: data.body.items[u].track.album.images[1].url,
-										  //   		previewUrl: data.boty.items[u].track.preview_url,
-										  //   		fullSpotifyUrl: data.body.items[u].track.external_urls.spotify,
-										  //   	};
-										  //   	console.log("trackInfo >>> ", trackInfo);
-												// console.log("this trackInfoAll >>> ", trackInfoAll);
+
+										     	trackInfoAll = {
+										     		trackId: data.body.items[t].track.id,
+										     		playlistId: thisTrack,
+										     		spotifyId: spotifyId,
+										     		title: data.body.items[t].track.name,
+										     		artist: data.body.items[t].track.album.artists, //this is an array
+										     		album: data.body.items[t].track.album.name,
+										     		artworkUrl: data.body.items[t].track.album.images[1].url,
+										     		previewUrl: data.boty.items[t].track.preview_url,
+										     		fullSpotifyUrl: data.body.items[t].track.external_urls.spotify
+										     	};
+										     	console.log("trackInfo >>> 2 ", trackInfo);
+												console.log("this trackInfoAll >>> 3 >>> ", trackInfoAll);
 
 												playlistArrayForTracks.push(trackInfo);
-
+												anotherArray.push(trackInfoAll);
+												console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
+												console.log("anotherArray - what I'm looking for", anotherArray);
 
 										    } // close for loop
 										    // console.log("playlistArrayForTracks: ", playlistArrayForTracks);				
 											console.log("thisTrack thisTrack thisTrack thisTrack: ", thisTrack);
 											
-// // save track names and track ids in the playlists database for each playlist id
-// 											var playlistTracks = {};
-// 											playlistTracks.trackIds = playlistArrayForTracks;
-// 											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
-// 													if(err){
-// 														console.log("error saving playlistTracks to playlists database - ", err.message);
-// 													} else {
-// 														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
-// 														console.log("playlistTracks saved to playlist database - success");	
-// 													}
-// 											}); // close db.Playlist.findOneAndUpdate...
+// save track names and track ids in the playlists database for each playlist id
+											var playlistTracks = {};
+											playlistTracks.trackIds = playlistArrayForTracks;
+											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
+													if(err){
+														console.log("error saving playlistTracks to playlists database - ", err.message);
+													} else {
+														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
+														console.log("playlistTracks saved to playlist database - success");	
+													}
+											}); // close db.Playlist.findOneAndUpdate...
 
 
 											// console.log("data.body.items TRACK ALBUM ", data.body.items[3]);
@@ -355,6 +369,10 @@ app.get('/callback', function(req, res) {
 							}); // playlistIds.forEach(...
 
 //************
+
+
+
+
 
 						}) // close previous .then()
 			        	.catch(function(err){
