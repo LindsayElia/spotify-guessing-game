@@ -56,8 +56,8 @@ var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 // _______EDIT THIS BEFORE DEPLOYING TO HEROKU/PRODUCTION_______
 
 // will need to edit this for production:
-var redirect_uri = "http://localhost:3000/callback";		// development URL
-// var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
+// var redirect_uri = "http://localhost:3000/callback";		// development URL
+var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
 
 
 // Generates a random string containing numbers and letters
