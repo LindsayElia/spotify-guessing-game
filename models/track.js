@@ -3,7 +3,7 @@ mongoose.set("debug", true);
 
 var trackSchema = new mongoose.Schema({
 	trackIdplaylistId: {
-		type: String,
+		type: Object,
 		unique: true
 	},
 	// getting the track id + the playlistId in case there are

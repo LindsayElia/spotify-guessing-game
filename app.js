@@ -295,7 +295,6 @@ app.get('/callback', function(req, res) {
 
 							var allPlaylistsWithTracksArray = [];
 							return playlistIds.forEach(function(playlist){
-								// get track info for each playlist, up to the first 10 tracks in a playlist
 								var thisTrack = playlist.playlistId;
 								// console.log("hiiiii - thisTrack: ", thisTrack);
 								var playlistArrayForTracks = [];
@@ -324,14 +323,18 @@ app.get('/callback', function(req, res) {
 										    	// console.log("trackInfo >>> 1 >>> ", trackInfo);
 // second, save all track info to an object
 // to be saved in tracks database				
-												console.log("track data returned as json >>> ", data.body.items[t]);
-												console.log("artwork URL >>> ", data.body.items[t].track.album.images[1].url);
-												console.log("looking for preview URL >>> ", data.body.items[t].track.disc_number);
+												// console.log("track data returned as json >>> ", data.body.items[t]);
+												// console.log("artwork URL >>> ", data.body.items[t].track.album.images[1].url);
+												// console.log("looking for preview URL >>> ", data.body.items[t].track.disc_number);
 												// make a unique identifier for the song
 												// in case the song has the same track id as other songs in our database
-												var uniqueTrackId = data.body.items[t].track.id + thisTrack;
+												// var uniqueTrackId = data.body.items[t].track.id + thisTrack;
+												console.log("mystery track id >>> ", data.body.items[t].track.id);
 										     	trackInfoAll = {
-										     		trackIdplaylistId: uniqueTrackId,
+										     		trackIdplaylistId: {
+										     			trackId: data.body.items[t].track.id,
+										     			playlistId: thisTrack
+										     		},
 										     		playlistId: thisTrack,
 										     		spotifyId: spotifyId,
 										     		title: data.body.items[t].track.name,
@@ -350,7 +353,7 @@ app.get('/callback', function(req, res) {
 
 // save all track info to the tracks database
 												var thisTrackId = trackInfoAll.trackId;
-												db.Track.findOneAndUpdate({trackId:thisTrackId}, trackInfoAll, {new: true, upsert: true}, function(err, track){
+												db.Track.findOneAndUpdate({trackIdplaylistId:trackInfoAll.trackIdplaylistId}, trackInfoAll, {new: true, upsert: true}, function(err, track){
 													if(err){
 														console.log("error saving trackInfoAll to tracks database - ", err.message);
 													} else {
