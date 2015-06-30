@@ -13,9 +13,18 @@ $(function() {
 	var $divSongResults = $("#divSongResults");
 
 
-	var currentTracksArr = [];
+	var songsArray = [];
 
-	function loadTracks(currentTracksArr){
+	// temporary list of songs - this is hard-coded and now replaced with the songs loaded by loadTracks()
+	// var songsArray = ["0eGsygTp906u18L0Oimnem", 
+	// 					"5sra5UY6sD658OabHL3QtI", 
+	// 					"6qOEjO2IUD7PjtpsXawq0d",
+	// 					"5ybJm6GczjQOgTqmJ0BomP", // this one doesn't play anything because the previewUrl is "null"
+	// 					"1BeY7Qw9d77wXOqABHpffT",
+	// 					"4I3YxhCTk88ClnlBbtDaK0",
+	// 					"7DUoFVzdG9bQ2kOmdRjCj9"];
+
+	function loadTracks(){
 		$.getJSON("/users/" + destinationId + "/play/" + currentPlaylist)
 			.done(function(songData, status){
 				console.log(songData, "data inside of loadTracks getJSON call");
@@ -26,50 +35,30 @@ $(function() {
 				for (var i = 0; i < tracksArr.length; i++ ) {
 					var thisTrackId = tracksArr[i].trackId;
 					console.log(thisTrackId, "thisTrackId");
-					currentTracksArr.push(thisTrackId);
+					songsArray.push(thisTrackId);
 
 					$divSongResults.append("<ul><li>" + thisTrackId +
 										"</li></ul>");
 
 				}
-				console.log(currentTracksArr, "currentTracksArr 1");
-				return currentTracksArr;
+				// console.log(songsArray, "songsArray 1");
+				return songsArray;
 			})
 			.fail(function(){
 				console.log("error with ajax request to get/playlist route");
 			});
 	} // close loadTracks()
-
-	// function updateTracksArray (data, callback){
-	// 	currentTracksArr.push(data);
-	// 	callback(data);
-	// }
-
-	// console.log(updateTracksArray(currentTracksArr,loadTracks), "logging...");
-
-	// var myVar = loadTracks(currentTracksArr);
-	// console.log(myVar, "myVar 3rd try");
 	
 	loadTracks();
-	console.log(loadTracks(currentTracksArr), "currentTracksArr 2");
-	// I wonder if currentTracksArr is now the array, and console.log just doesn't catch it??
+
+// if I had lots more time, I could refactor to - put the code to play the game inside of a function,
+// and call that functino when loadTracks() is done (inside of it). However, since the code to play doesn't
+// run until the user clicks the 'start' button, which is most likely after the page is finished loading,
+// it's a very small difference in time ("race condition" is what Tim called it). Also, if the start
+// button doesn't load it the first time, it does load it the second time it is clicked, so the user
+// should still be able to figure out how to play easily enough.
 
 
-
-	// temporary list of songs
-	// var songsArray = ["0eGsygTp906u18L0Oimnem", 
-	// 					"5sra5UY6sD658OabHL3QtI", 
-	// 					"6qOEjO2IUD7PjtpsXawq0d",
-	// 					"5ybJm6GczjQOgTqmJ0BomP", // this one doesn't play anything because the previewUrl is "null"
-	// 					"1BeY7Qw9d77wXOqABHpffT",
-	// 					"4I3YxhCTk88ClnlBbtDaK0",
-	// 					"7DUoFVzdG9bQ2kOmdRjCj9"];
-
-		
-
-	// var songsArrayReplacement = [];
-
-	var songsArray = currentTracksArr;
 
 	// global variables
 	var currentSong;
