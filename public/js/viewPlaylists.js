@@ -27,12 +27,12 @@ $(function() {
 						.done(function(playlistData, status){
 							console.log(playlistData, "data inside of /playlists/:playlistId call");
 
-							// if (playlistData.playlist.trackIds.length > 0) {
+							if (playlistData.playlist.trackIds.length > 0) {
 								$showPlaylists.append("<ul><li>Playlist: " + 
 								playlistData.playlist.playlistName + 
 								"</li><li># of songs: " + playlistData.playlist.trackIds.length +
 								"</li><li><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId +"'><button class='button'>Pick Me</button></a></li></ul>");		
-							// }
+							}
 						})
 						.fail(function(){
 							console.log("error with ajax request to playlist database");
