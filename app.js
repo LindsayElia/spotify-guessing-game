@@ -331,12 +331,8 @@ app.get('/callback', function(req, res) {
 												// var uniqueTrackId = data.body.items[t].track.id + thisTrack;
 												console.log("mystery track id >>> ", data.body.items[t].track.id);
 										     	trackInfoAll = {
-										     		trackIdplaylistId: {
-										     			trackId: data.body.items[t].track.id,
-										     			playlistId: thisTrack
-										     		},
-										     		playlistId: thisTrack,
-										     		spotifyId: spotifyId,
+										     		trackId: data.body.items[t].track.id,
+											   		spotifyId: spotifyId,
 										     		title: data.body.items[t].track.name,
 										     		artist: data.body.items[t].track.artists, //this is an array
 										     		album: data.body.items[t].track.album.name,
@@ -353,7 +349,7 @@ app.get('/callback', function(req, res) {
 
 // save all track info to the tracks database
 												var thisTrackId = trackInfoAll.trackId;
-												db.Track.findOneAndUpdate({trackIdplaylistId:trackInfoAll.trackIdplaylistId}, trackInfoAll, {new: true, upsert: true}, function(err, track){
+												db.Track.findOneAndUpdate({trackId:trackInfoAll.trackId}, trackInfoAll, {new: true, upsert: true}, function(err, track){
 													if(err){
 														console.log("error saving trackInfoAll to tracks database - ", err.message);
 													} else {
@@ -600,32 +596,28 @@ app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserL
 	}); //close db.User.findOne
 }); // close app.get
 
-//
-app.get("/users/:spotifyId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
-		// console.log("get /users findOne is running");
+// SHOW track info
+// get /track/ + thisTrackId
+app.get("/track/:trackId", function(req, res){
+	db.Track.findOne({trackId:req.params.trackId}, function(err, track){
 		if(err){
-			console.log(err, "error in getting /users/:spotifyId route");
+			console.log(err, "error in getting /play/:playlistId/track/:trackIdplaylistId route");
 			res.render("errors/500");
 		} else {
 			res.format({
 				"text/html": function(){
-					res.render("users/show", {user:user});
+					res.render("rounds/play", {track:track});
 				},
 				"application/json": function(){
-					res.send({user:user});
+					res.send({track:track});
 				},
 				"default": function(){
 					res.status(406).send("Not an acceptable format for this page");
 				}
 			});
-		}		
+		}
 	});
 });
-
-
-
-
 
 
 

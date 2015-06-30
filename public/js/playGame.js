@@ -3,18 +3,73 @@ $(function() {
 	// check that this file is connected to the page we're using it on
 	console.log("playGame.js file loaded");
 
+	// load song tracks into this file as an array
+	var $spotifyId = $("#spotifyId");
+	var destinationId = $spotifyId.val();
+
+	var $playlistId = $("#playlistId");
+	var currentPlaylist = $playlistId.val();
+
+	var $divSongResults = $("#divSongResults");
+
+
+	var currentTracksArr = [];
+
+	function loadTracks(currentTracksArr){
+		$.getJSON("/users/" + destinationId + "/play/" + currentPlaylist)
+			.done(function(songData, status){
+				console.log(songData, "data inside of loadTracks getJSON call");
+
+				var tracksArr = songData.playlist.trackIds;
+				console.log(tracksArr, "tracksArr");
+
+				for (var i = 0; i < tracksArr.length; i++ ) {
+					var thisTrackId = tracksArr[i].trackId;
+					console.log(thisTrackId, "thisTrackId");
+					currentTracksArr.push(thisTrackId);
+
+					$divSongResults.append("<ul><li>" + thisTrackId +
+										"</li></ul>");
+
+				}
+				console.log(currentTracksArr, "currentTracksArr 1");
+				return currentTracksArr;
+			})
+			.fail(function(){
+				console.log("error with ajax request to get/playlist route");
+			});
+	} // close loadTracks()
+
+	// function updateTracksArray (data, callback){
+	// 	currentTracksArr.push(data);
+	// 	callback(data);
+	// }
+
+	// console.log(updateTracksArray(currentTracksArr,loadTracks), "logging...");
+
+	// var myVar = loadTracks(currentTracksArr);
+	// console.log(myVar, "myVar 3rd try");
+	
+	loadTracks();
+	console.log(loadTracks(currentTracksArr), "currentTracksArr 2");
+	// I wonder if currentTracksArr is now the array, and console.log just doesn't catch it??
+
+
+
 	// temporary list of songs
-	var songsArray = ["0eGsygTp906u18L0Oimnem", 
-						"5sra5UY6sD658OabHL3QtI", 
-						"6qOEjO2IUD7PjtpsXawq0d",
-						"5ybJm6GczjQOgTqmJ0BomP", // this one doesn't play anything because the previewUrl is "null"
-						"1BeY7Qw9d77wXOqABHpffT",
-						"4I3YxhCTk88ClnlBbtDaK0",
-						"7DUoFVzdG9bQ2kOmdRjCj9"];
+	// var songsArray = ["0eGsygTp906u18L0Oimnem", 
+	// 					"5sra5UY6sD658OabHL3QtI", 
+	// 					"6qOEjO2IUD7PjtpsXawq0d",
+	// 					"5ybJm6GczjQOgTqmJ0BomP", // this one doesn't play anything because the previewUrl is "null"
+	// 					"1BeY7Qw9d77wXOqABHpffT",
+	// 					"4I3YxhCTk88ClnlBbtDaK0",
+	// 					"7DUoFVzdG9bQ2kOmdRjCj9"];
 
 		
 
-	var songsArrayReplacement = [];
+	// var songsArrayReplacement = [];
+
+	var songsArray = currentTracksArr;
 
 	// global variables
 	var currentSong;
@@ -25,7 +80,6 @@ $(function() {
 	var $divUserInputGuess = $("#divUserInputGuess");
 	var $inputGuessForm = $("#inputGuessForm");
 	var $countdown = $("#countdown");
-	var $divSongResults = $("#divSongResults");
 	var $divScore = $("#divScore");
 	var $pSongResults = $("#pSongResults");
 	var dataSpotify;
@@ -65,7 +119,7 @@ $(function() {
 			console.log(status);
 			console.log(dataRcvd);
 			dataSpotify = dataRcvd;
-			console.log("trying to capture just preview URL: " + dataSpotify.preview_url);
+			// console.log("trying to capture just preview URL: " + dataSpotify.preview_url);
 			// put song preview URL in as the source for the audio element
 
 // !!!!

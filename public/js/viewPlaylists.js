@@ -43,7 +43,7 @@ $(function() {
 			.fail(function(){
 				console.log("error with ajax request to user database");
 			});
-	}
+	} // close loadPlaylists()
 
 	loadPlaylists();
 
