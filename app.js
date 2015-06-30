@@ -50,10 +50,14 @@ var client_id = process.env.SPOTIFY_CLIENT_ID;
 var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 // console.log(client_secret, "-- SPOTIFY_CLIENT_SECRET");
 
-// _______EDIT LATER_______
+
+// _______EDIT THIS BEFORE DEPLOYING TO HEROKU/PRODUCTION_______
+// _______EDIT THIS BEFORE DEPLOYING TO HEROKU/PRODUCTION_______
+// _______EDIT THIS BEFORE DEPLOYING TO HEROKU/PRODUCTION_______
+
 // will need to edit this for production:
-// var redirect_uri = "http://localhost:3000/callback";		// development URL
-var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
+var redirect_uri = "http://localhost:3000/callback";		// development URL
+// var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
 
 
 // Generates a random string containing numbers and letters
@@ -319,32 +323,48 @@ app.get('/callback', function(req, res) {
 										    	};
 										    	console.log("trackInfo >>> 1 >>> ", trackInfo);
 // second, save all track info to an object
-// to be saved in tracks database
-
+// to be saved in tracks database				
+												// make a unique identifier for the song
+												// in case the song has the same track id as other songs in our database
+												var uniqueTrackId = data.body.items[t].track.id + thisTrack;
 										     	trackInfoAll = {
-										     		trackId: data.body.items[t].track.id,
+										     		trackIdplaylistId: uniqueTrackId,
 										     		playlistId: thisTrack,
 										     		spotifyId: spotifyId,
 										     		title: data.body.items[t].track.name,
-										     		artist: data.body.items[t].track.album.artists, //this is an array
-										     		album: data.body.items[t].track.album.name,
-										     		artworkUrl: data.body.items[t].track.album.images[1].url,
-										     		previewUrl: data.boty.items[t].track.preview_url,
-										     		fullSpotifyUrl: data.body.items[t].track.external_urls.spotify
+										     		artist: data.body.items[t].track.artists //this is an array
+										     		// album: data.body.items[t].track.album.name,
+										     		// artworkUrl: data.body.items[t].track.album.images[1].url,
+										     		// previewUrl: data.boty.items[t].track.preview_url,
+										     		// fullSpotifyUrl: data.body.items[t].track.external_urls.spotify
 										     	};
 										     	console.log("trackInfo >>> 2 ", trackInfo);
 												console.log("this trackInfoAll >>> 3 >>> ", trackInfoAll);
 
 												playlistArrayForTracks.push(trackInfo);
-												anotherArray.push(trackInfoAll);
 												console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
 												console.log("anotherArray - what I'm looking for", anotherArray);
+
+// save all track info to the tracks database
+												var thisTrackId = trackInfoAll.trackId;
+												db.Track.findOneAndUpdate({trackId:thisTrackId}, trackInfoAll, {new: true, upsert: true}, function(err, track){
+													if(err){
+														console.log("error saving trackInfoAll to tracks database - ", err.message);
+													} else {
+														console.log("trackInfoAll saved to tracks database - ", trackInfoAll);
+														console.log("trackInfoAll saved to tracks database - success");
+													}
+												}); // close db.Playlist.findOneAndUpdate...for Tracks
+
+
 
 										    } // close for loop
 										    // console.log("playlistArrayForTracks: ", playlistArrayForTracks);				
 											console.log("thisTrack thisTrack thisTrack thisTrack: ", thisTrack);
 											
 // save track names and track ids in the playlists database for each playlist id
+// doing this outside of the for loop because I can save the whole
+// array at once, to the trackIds value in the playlist model
 											var playlistTracks = {};
 											playlistTracks.trackIds = playlistArrayForTracks;
 											db.Playlist.findOneAndUpdate({playlistId:thisTrack}, playlistTracks, {new: true, upsert: true}, function(err, playlist){
@@ -354,10 +374,10 @@ app.get('/callback', function(req, res) {
 														// console.log("playlistTracks saved to playlists database: ", playlistTracks);
 														console.log("playlistTracks saved to playlist database - success");	
 													}
-											}); // close db.Playlist.findOneAndUpdate...
+											}); // close db.Playlist.findOneAndUpdate...for Playlists
 
-
-											// console.log("data.body.items TRACK ALBUM ", data.body.items[3]);
+											
+											
 										   
 
 
