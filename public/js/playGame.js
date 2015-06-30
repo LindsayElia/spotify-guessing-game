@@ -34,12 +34,8 @@ $(function() {
 
 				for (var i = 0; i < tracksArr.length; i++ ) {
 					var thisTrackId = tracksArr[i].trackId;
-					console.log(thisTrackId, "thisTrackId");
+					// console.log(thisTrackId, "thisTrackId");
 					songsArray.push(thisTrackId);
-
-					$divSongResults.append("<ul><li>" + thisTrackId +
-										"</li></ul>");
-
 				}
 				// console.log(songsArray, "songsArray 1");
 				return songsArray;
@@ -60,6 +56,24 @@ $(function() {
 
 
 
+// pick up here
+
+// 2. make calls to my database INSTEAD of to the spotify API when playing/loading the songs for the game,
+// & display artist info (already displaying...)
+
+// 3. choose just 10 songs from playlists that have more than 10 songs
+// if playlist has 10 or fewer songs, play all of them
+// 4. randomize the 10 (or fewer) song choices
+// 5. add semantic UI styling
+// 6. get playlists user is following, not just the ones they have created
+// 7. if preview url is null, either don't choose it, tell the user there's no preview, or skip it in game altogether
+
+
+// only if time:
+// 1. is track ID always the same, no matter which playlist & which user it's for?
+// 2. fix countdown so I can see "time is up" but only at the end of the countdown, not
+// at the start and end of the countdown
+
 	// global variables
 	var currentSong;
 	var counter = 0;
@@ -79,6 +93,7 @@ $(function() {
 	var $numIncorrect = $("#numIncorrect");
 	var $countdownTimer = $("#countdownTimer");
 	var $countdownTimerHeader = $("#countdownTimerHeader");
+	var timeLeft;
 
 
 	// hide parts of the page on inital page load
@@ -87,90 +102,77 @@ $(function() {
 	$divScore.hide();
 	$countdown.hide();
 
-	// when "start" button/form is clicked, make request and play new song
+	// when "start" button/form is clicked, 
+	// make request to my database,
+	// and play a new song
 	$startGameForm.on("submit", function(event){		// why is on.submit not working, but on.click works?
 		event.preventDefault();
 		console.log("#startGameForm submitted");
 
-		currentSong = songsArray[counter];
+		currentSong = songsArray[counter];	
 
-		console.log($audioPreviewUrl.attr("src"));
-		
-		//$audioPreviewUrl.attr("src", newURL goes here));
-		
-		// make request to Spotify API
-		// get song preview URL by track #
-		$.ajax({
-			method: "GET",
-			url: "https://api.spotify.com/v1/tracks/" + currentSong,
-		})
-		.done(function(dataRcvd, status){
-			console.log(status);
-			console.log(dataRcvd);
-			dataSpotify = dataRcvd;
-			// console.log("trying to capture just preview URL: " + dataSpotify.preview_url);
-			// put song preview URL in as the source for the audio element
+		// make request to my Tracks database to get info for the song
+		$.getJSON("/track/" + currentSong)
+			.done(function(fullTrackData, status){
+				console.log(fullTrackData, "fullTrackData");
+				dataSpotify = fullTrackData;
 
-// !!!!
-// if dataRcvd.preview_url (dataSpotify) === "null" then tell the player to select a different song for their playlist
-// !!!!
+				$audioPreviewUrl.attr("src", dataSpotify.track.previewUrl);
+				// play the song
+				$audioPreviewUrl.on("canplay", function() {
+					$audioPreviewUrl[0].play();
+				});
 
-			$audioPreviewUrl.attr("src", dataSpotify.preview_url);
+				// hide the start button, show the guess form, hide the results from previous answer
+				$startGameForm.hide();
+				$divUserInputGuess.show();
+				$divSongResults.hide();
+				$divScore.hide();
 
-			// play the song
-			$audioPreviewUrl.on("canplay", function() {
-				$audioPreviewUrl[0].play();
+		// count down a timer from 30 seconds
+				// all previews are 30 seconds according to Spotify API documentation
+				$countdown.show();
+
+				timeLeft = 29;
+				function countdown(){
+					if (timeLeft === 0){
+						$countdownTimerHeader.html("");
+						// $countdownTimer.html("time is up");
+						$countdownTimer.html("");
+						// console.log("time is up");
+						clearInterval(someIntervalId);
+					}
+					else {
+						$countdownTimerHeader.html("Seconds left to guess:");
+						$countdownTimer.html(timeLeft);
+						// console.log(timeLeft)
+						timeLeft--;
+					}
+				}
+				
+				var someIntervalId;
+				function startTimer(){
+					someIntervalId = setInterval(countdown, 1000);
+				}
+				
+				startTimer();
+
+			})
+			.fail(function(){
+				console.log("error with ajax request to get track/thisTrackId route");
 			});
 
-			// hide the start button, show the guess form, hide the results from previous answer
-			$startGameForm.hide();
-			$divUserInputGuess.show();
-			$divSongResults.hide();
-			$divScore.hide();
-
-			// count down the timer from 30 seconds
-			// all previews are 30 seconds according to Spotify API documentation
-			$countdown.show();
-
-			var timeLeft = 29;
-			function countdown(){
-				if (timeLeft === 0){
-					$countdownTimerHeader.html("");
-					$countdownTimer.html("time is up");
-					// console.log("time is up");
-					clearInterval(someIntervalId);
-				}
-				else {
-				//	setTimeout(countdown, 1000);
-					$countdownTimerHeader.html("Seconds left to guess:");
-					$countdownTimer.html(timeLeft);
-					// console.log(timeLeft)
-					timeLeft--;
-				}
-			}
-			
-			var someIntervalId;
-			function startTimer(){
-				someIntervalId = setInterval(countdown, 1000);
-			}
-			
-			startTimer();
-
-		})
-		.fail(function(){
-			console.log("error with ajax request to Spotify API");
-		});
-
-		// increase the counter
+		// increase the counter to move to next trackId in songsArray
 		counter = counter + 1;
 
 	});
 
 	// on guess submit, do things...
+	// show the info for the song from my database
 	$inputGuessForm.on("submit", function(event){
 		event.preventDefault();
 		console.log("#divUserInputGuess submitted");
-		$pSongResults.html("<li><img src='" + dataSpotify.album.images[1].url + 
+		$pSongResults.html("<li><img src='" + dataSpotify.track.artworkUrl + 
 							"' height='" + dataSpotify.album.images[1].height + 
 							"' width='" + dataSpotify.album.images[1].width + "'></li>" +
 							"<li>Artist: " + dataSpotify.artists[0].name + "</li>" + 
@@ -186,6 +188,7 @@ $(function() {
 		$startButton.val("Play again");
 		$startGameForm.show();
 		$countdown.hide();
+		timeLeft = 0; // clear the countdown timer so it doesn't show both timers if the user guesses before the time is up
 		
 		// check user's guess against song results
 		var guessAsIs = $userInputGuess.val();

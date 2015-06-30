@@ -562,6 +562,9 @@ app.get("/play/computer", routeHelper.ensureSameSpotifyUserLoggedIn, function(re
 	res.render("rounds/play");
 });
 
+//
+// I can delete this? after my play file is working
+//
 // PLAY - GET "play" - play computer
 app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
 	console.log("getting /users/:spotifyId/play/:playlistId");
