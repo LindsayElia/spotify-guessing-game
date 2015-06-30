@@ -1,6 +1,19 @@
 <!-- Play game! page to show/hide songs, play music, accept guesses -->
 <% include ../partials/header %>
 
+<div>
+	Logged in currently as <%= user.fullName %>  	
+	<a href="/logout"><button class="button logout">Logout</button></a>
+</div>
+
+<form>
+	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
+</form>
+
+<form>
+	<input type="hidden" id="playlistId" value="<%= playlist.playlistId %>">
+</form>
+
 <h1>Play game!!!!</h1>
 
 <div id="leftContainer">
@@ -61,6 +74,7 @@
 
 
 <!-- bring in custom js scripts for this page -->
+<script type="text/javascript" src="/js/viewSongs.js"></script>
 <script type="text/javascript" src="/js/playGame.js"></script>
 
 <% include ../partials/footer %>

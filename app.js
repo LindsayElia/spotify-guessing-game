@@ -569,31 +569,65 @@ app.get("/play/computer", routeHelper.ensureSameSpotifyUserLoggedIn, function(re
 // PLAY - GET "play" - play computer
 app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
 	console.log("getting /users/:spotifyId/play/:playlistId");
-	db.Playlist.findOne({playlistId:req.params.playlistId}, function(err, playlist){
+	// find this user & load into page
+	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
 		if(err){
-			console.log(err, "error in getting /play/:playlistId route");
+			console.log(err, "error in getting /users/:spotifyId/play/:playlistId, user DB");
+			res.render("errors/500");
+		} else {
+			// find tracks for this playlist & load into page
+			db.Playlist.findOne({playlistId:req.params.playlistId}, function(err, playlist){
+				if(err){
+					console.log(err, "error in getting /users/:spotifyId/play/:playlistId route, playlist DB");
+					res.render("errors/500");
+				} else {
+					// render the page / send info to our frontend js file(s)
+					res.format({
+						"text/html": function(){
+						// grab track info out of our db when we load this page
+							res.render("rounds/play", {user:user, playlist:playlist});
+						},
+						"application/json": function(){
+							res.send({playlist:playlist});
+						},
+						"default": function(){
+							res.status(406).send("Not an acceptable format for this page");
+						}
+					}); // close res.format
+				} // close else
+			}); // close db.Playlist.findOne
+		} // close else
+	}); //close db.User.findOne
+}); // close app.get
+
+//
+app.get("/users/:spotifyId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
+	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
+		// console.log("get /users findOne is running");
+		if(err){
+			console.log(err, "error in getting /users/:spotifyId route");
 			res.render("errors/500");
 		} else {
 			res.format({
 				"text/html": function(){
-				// grab track info out of our db when we load this page
-					
-
-
-
-
-					res.render("rounds/play", {playlist:playlist});
+					res.render("users/show", {user:user});
 				},
 				"application/json": function(){
-					res.send({playlist:playlist});
+					res.send({user:user});
 				},
 				"default": function(){
 					res.status(406).send("Not an acceptable format for this page");
 				}
 			});
-		}
+		}		
 	});
 });
+
+
+
+
+
+
 
 // 500 page - oopsie
 app.get("/errors/500", function(req, res){

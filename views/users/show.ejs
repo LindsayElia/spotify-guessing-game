@@ -7,6 +7,11 @@
 	<a href="/logout"><button class="button logout">Logout</button></a>
 </div>
 
+<form>
+	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
+</form>
+
+
 <div>
 	<img src="<%= user.imageUrl %>" height="150px" width="160px">
 </div>
@@ -17,10 +22,6 @@
 	<p>Current (non-empty) playlists:</p>
 	<p id="showPlaylists"></p>
 </div>
-
-<form>
-	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
-</form>
 
 <div>
 	<a href="/users/<%= user.spotifyId %>/edit"><button class="button">Edit user info</button></a>

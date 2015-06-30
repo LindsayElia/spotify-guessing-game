@@ -45,9 +45,7 @@ $(function() {
 			});
 	}
 
-
 	loadPlaylists();
-
 
 
 }); // close $ wrapper
