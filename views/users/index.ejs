@@ -3,49 +3,16 @@
 
 
 
-<% if(req.session.id === null || req.session.id === undefined){  %>
+<div class="border">
+	<p>About this application...</p>
+</div>
 
-	<p>Index Users Page - HOME page - PUBLIC<p>
+<div class="border">
+	<h3>Sign in using your Spotify Account</h3>
+    
+    <a href="/login/spotify"><button class="button">Login with Spotify</button></a>
 
-	<div class="border">
-		<p>About this application...</p>
-	</div>
-
-	<div class="border">
-		<h3>Sign in using your Spotify Account</h3>
-	    
-	    <a href="/login/spotify"><button class="button">Login with Spotify</button></a>
-
-	</div>
-
-
-	<div class="border">
-		<p>This will display the scores for all players when NOT logged in.</p>
-	</div>
-
-	<a href="/logout"><button class="button logout">Logout</button></a>
-
-<%  }  %>
-
-
-<% if(req.session.id !== null && req.session.id !== undefined){  %>
-
-	<p>Welcome! You are now logged in. <p>
-
-	<div class="border" id="userProfileDiv">
-		
-		<p>Logged in currently as <%= req.query.display_name %></p>
-
-	</div>
-
-	<div>
-		
-		<a href="/users/<%= req.query.spotifyId %>"><button class="button">Continue</button></a>
-		<a href="/logout"><button class="button logout">Logout</button></a>
-	</div>
-
-
-<%  }  %>
+</div>
 
 
 

@@ -94,6 +94,7 @@ app.get('/login/spotify', function(req, res) {
     }));
 });
 
+// ON RETURN, GET ALL THE DATA FROM THE API AND STORE IT IN MY DATABASES
 
 app.get('/callback', function(req, res) {
 
@@ -277,10 +278,6 @@ app.get('/callback', function(req, res) {
 							return playlistsArray;
 						})
 
-
-
-
-
 //************
 
 						.then(function(playlistsArray){
@@ -378,10 +375,6 @@ app.get('/callback', function(req, res) {
 													}
 											}); // close db.Playlist.findOneAndUpdate...for Playlists
 
-											
-											
-										   
-
 
 									} // close else if
 										
@@ -391,10 +384,6 @@ app.get('/callback', function(req, res) {
 							}); // playlistIds.forEach(...
 
 //************
-
-
-
-
 
 						}) // close previous .then()
 			        	.catch(function(err){
@@ -419,11 +408,7 @@ app.get('/callback', function(req, res) {
 //______________ROUTES______________
 
 
-app.get("/welcome", function(req, res){
-	res.render("users/welcome");
-});
-
-//_______HOME_______
+//_______PUBLIC_______
 
 // ROOT
 app.get("/", function(req, res){
@@ -435,30 +420,20 @@ app.get("/index", function(req, res){
 	res.render("users/index", {req:req});
 });
 
-app.get("/index/:spotifyId", function(req, res){
-	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
-		if(err){
-			console.log(err, "error in getting /users/:spotifyId route");
-			res.render("errors/500");
-		} else {
-			res.render("users/index", {req:req});
-		}
-	});
-});
-
 //_______LOGOUT_______
+
 app.get("/logout", function(req, res){
 	req.logout();
 	res.redirect("/index");
 });
 
+
 //_______USER ROUTES_______
 
-
+// after user logs in, redirect them to their show page with their info in the query
 app.get("/users/redirect", routeHelper.ensureSameSpotifyUser, function(req, res){
 		res.redirect("/users/" + req.query.spotifyId);
 });
-
 
 // SHOW - GET "show"
 // show user's bio, friends, and playlists
@@ -484,46 +459,8 @@ app.get("/users/:spotifyId", routeHelper.ensureSameSpotifyUserLoggedIn, function
 	});
 });
 
-// UPDATE - PUT "edit"
-// post updated/edited bio info & redirect to the users/show page
-// app.put("/users/:user_id", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-
-// 	var userUpdates = {};
-// 	userUpdates.avatarUrl = req.body.userAvatarUrl;
-// //	userUpdates.genres.push(req.body.userGenres); 
-// // having trouble updating the genres array here
-
-// 	db.User.findByIdAndUpdate(req.params.user_id, userUpdates, function(err, user){
-// 		if(err){
-// 			console.log(err);
-// 			res.render("errors/500");
-// 		} else {
-// 			res.redirect("/users/" + user._id);
-// 		}
-// 	});
-// });
-
-// EDIT - GET "edit"
-// show form to edit user's bio
-app.get("/users/:spotifyId/edit", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
-		if(err){
-			console.log(err);
-			res.render("errors/500");
-		} else {
-			res.render("users/edit", {user:user});
-		}
-	});
-});
-
 
 //_______PLAYLISTS ROUTES_______
-
-// NEW - GET "new"
-// search songs to add to playlist
-app.get("/playlists/new", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	res.render("playlists/new");
-});
 
 // SHOW playlist info
 app.get("/playlists/:playlistId", function(req, res){
@@ -547,25 +484,9 @@ app.get("/playlists/:playlistId", function(req, res){
 	});
 });
 
-// SHOW - POST to users/show
-// post updated/edited playlist info & redirect to the user's show page
-app.post("playlists/:playlist_id", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	// do stuff
-	res.redirect("/users/:user_id");
-});
-
 //_______ROUNDS ROUTES_______
 
-// PLAY - GET "play" - play computer
-app.get("/play/computer", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
-	// do stuff
-	res.render("rounds/play");
-});
-
-//
-// I can delete this? after my play file is working
-//
-// PLAY - GET "play" - play computer
+// PLAY - GET "play" for current user and current playlist
 app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
 	console.log("getting /users/:spotifyId/play/:playlistId");
 	// find this user & load into page
@@ -622,7 +543,7 @@ app.get("/track/:trackId", function(req, res){
 	});
 });
 
-
+//_______ERRORS_______
 
 // 500 page - oopsie
 app.get("/errors/500", function(req, res){
@@ -634,6 +555,7 @@ app.get("/errors/500", function(req, res){
 app.get("*", function(req, res){
 	res.render("errors/404");
 });
+
 
 // _______START SERVER_______
 // remote port or localhost
