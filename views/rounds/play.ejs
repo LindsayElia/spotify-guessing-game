@@ -1,11 +1,7 @@
 <!-- Play game! page to show/hide songs, play music, accept guesses -->
 <% include ../partials/header %>
 
-<div>
-	Logged in currently as <%= user.fullName %>  	
-	<a href="/logout"><button class="button logout">Logout</button></a>
-</div>
-
+<!-- Hidden stuff -->
 <form>
 	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
 </form>
@@ -14,7 +10,17 @@
 	<input type="hidden" id="playlistId" value="<%= playlist.playlistId %>">
 </form>
 
+<!-- Logout button -->
+<div>
+	Logged in currently as <%= user.fullName %>  	
+	<a href="/logout"><button class="button logout">Logout</button></a>
+</div>
+
+<!-- back button -->
+<a href="/users/<%= user.spotifyId %>"><button class="button">Back to playlists</button></a>
+
 <h1>Play game!!!!</h1>
+<p>Guess the song name or artist name. Hurry, you only have 30 seconds!</p>
 
 <div id="leftContainer">
 
@@ -53,6 +59,13 @@
 
 
 <div id="rightContainer">
+
+<!-- song number -->
+	<div id="divSongCount">
+		<ul>
+			<li id="songCount"></li>
+		</ul>
+	</div>
 
 	<!-- countdown -->
 	<div id="countdown">
