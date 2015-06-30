@@ -310,20 +310,23 @@ app.get('/callback', function(req, res) {
 									}
 									
 									else if (data.body.total !== 0) {
-										console.log("all data.body.totalss ", data.body);
-										    console.log("data.body NOT/YES items: ", data.body.items);
+										// console.log("all data.body.totalss ", data.body);
+										    // console.log("data.body NOT/YES items: ", data.body.items);
 										    for(var t = 0; t < data.body.items.length; t++){
 
-										    	console.log("counting data.body.items.tracks...[t]", data.body.items[t]);
+										    	// console.log("counting data.body.items.tracks...[t]", data.body.items[t]);
 // first, save just the track name and track id to an object
 // to be saved in playlists database
 										    	trackInfo = {
 										    		title: data.body.items[t].track.name,
 										    		trackId: data.body.items[t].track.id
 										    	};
-										    	console.log("trackInfo >>> 1 >>> ", trackInfo);
+										    	// console.log("trackInfo >>> 1 >>> ", trackInfo);
 // second, save all track info to an object
 // to be saved in tracks database				
+												console.log("track data returned as json >>> ", data.body.items[t]);
+												console.log("artwork URL >>> ", data.body.items[t].track.album.images[1].url);
+												console.log("looking for preview URL >>> ", data.body.items[t].track.disc_number);
 												// make a unique identifier for the song
 												// in case the song has the same track id as other songs in our database
 												var uniqueTrackId = data.body.items[t].track.id + thisTrack;
@@ -332,18 +335,18 @@ app.get('/callback', function(req, res) {
 										     		playlistId: thisTrack,
 										     		spotifyId: spotifyId,
 										     		title: data.body.items[t].track.name,
-										     		artist: data.body.items[t].track.artists //this is an array
-										     		// album: data.body.items[t].track.album.name,
-										     		// artworkUrl: data.body.items[t].track.album.images[1].url,
-										     		// previewUrl: data.boty.items[t].track.preview_url,
-										     		// fullSpotifyUrl: data.body.items[t].track.external_urls.spotify
+										     		artist: data.body.items[t].track.artists, //this is an array
+										     		album: data.body.items[t].track.album.name,
+										     		artworkUrl: data.body.items[t].track.album.images[1].url,
+										     		previewUrl: data.body.items[t].track.preview_url,
+										     		fullSpotifyUrl: data.body.items[t].track.external_urls.spotify
 										     	};
-										     	console.log("trackInfo >>> 2 ", trackInfo);
+										     	// console.log("trackInfo >>> 2 ", trackInfo);
 												console.log("this trackInfoAll >>> 3 >>> ", trackInfoAll);
 
 												playlistArrayForTracks.push(trackInfo);
-												console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
-												console.log("anotherArray - what I'm looking for", anotherArray);
+												// console.log("data.body.items[t].track.name & id as an object -->>> ", trackInfo);
+												// console.log("anotherArray - what I'm looking for", anotherArray);
 
 // save all track info to the tracks database
 												var thisTrackId = trackInfoAll.trackId;
