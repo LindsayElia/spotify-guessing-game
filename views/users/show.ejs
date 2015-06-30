@@ -1,7 +1,6 @@
 <!-- display a single user's bio & game info -->
 <% include ../partials/header %>
 
-
 <div>
 	Logged in currently as <%= user.fullName %>  	
 	<a href="/logout"><button class="button logout">Logout</button></a>
@@ -16,7 +15,7 @@
 	<img src="<%= user.imageUrl %>" height="150px" width="160px">
 </div>
 
-<h1>Choose a playlist to guess up to 10 random the songs from that playlist.</h1>
+<h2>Choose a playlist to guess up to 10 random the songs from that playlist.</h2>
 
 <div class="border">
 	<p>Current (non-empty) playlists, created by you:</p>
