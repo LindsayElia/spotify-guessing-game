@@ -13,8 +13,9 @@ $(function() {
 	function loadPlaylists(){
 		$.getJSON("/users/" + destinationId)
 			.done(function(userData, status){
-				console.log(userData, "data inside of loadPlaylists getJSON call");
-				console.log(status, "status inside of loadPlaylists getJSON call");
+				console.log(userData, " data inside of loadPlaylists getJSON call");
+				console.log(status, " status inside of loadPlaylists getJSON call");
+				console.log(userData.user.playlistIds, " userData.user.playlistIds");
 
 				// display the playlist info on page
 				for (var i = 0; i < userData.user.playlistIds.length; i++){
@@ -24,9 +25,9 @@ $(function() {
 
 					$.getJSON("/playlists/" + currentPlaylist)
 						.done(function(playlistData, status){
-							console.log(playlistData, "data inside of /playlists/:playlistId call");
+							console.log(playlistData, " - playlistData - data inside of /playlists/:playlistId call");
 
-							if (playlistData.user.playlistIds.length > 0) {
+							if (playlistData.playlist.trackIds.length > 0) {
 							console.log("inside of if loop");
 								$showPlaylists.append("<div class='item'>" + 
 									"<div class='right floated'><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId + 

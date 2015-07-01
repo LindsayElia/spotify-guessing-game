@@ -73,8 +73,6 @@ var generateRandomString = function(length) {
 
 var stateKey = 'spotify_auth_state';
 
-//var authorizationCode;
-
 
 // ROUTES FOR GETTING AN ACCESS TOKEN / CODE / authorizationCode FROM SPOTIFY
 
@@ -212,8 +210,7 @@ app.get('/callback', function(req, res) {
 						.then(function(playlistData){
 // format the data how we want it, for saving in our db
 							console.log("all playlist data: -- items ", playlistData.body.items);
-							console.log("looking for owner id -- playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
-							console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
+							
 							// console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
 							// console.log("playlist 3 of 3: ", playlistData.body.items[2].id);
 
@@ -221,8 +218,19 @@ app.get('/callback', function(req, res) {
 // it's saving the owner of the playlist,
 // but it's a playlist i'm following that someone else owns,
 // so it associates the data with a different player in my db
+// get id off of LAST playlist in results - that's the most likely to belong to current user & 
+// will be the same throughout user's usage of my app
+// this is a bug I should figure out how to fix.
+// Maybe separately get user's tracks and then get tracks following?
+// seems like spotifyApi.getUserPlaylists gets ALL of them
+
+							var numberToGet = playlistData.body.items.length - 1;
+							console.log("playlist 1 of 3: ", playlistData.body.items[numberToGet].id);
+							console.log("looking for owner id -- playlistData.body.items[numberToGet].owner.id: ", playlistData.body.items[numberToGet].owner.id);
+
+
 							var playlistsArray = [{
-								playlistId: playlistData.body.items[0].owner.id,
+								playlistId: playlistData.body.items[numberToGet].owner.id,
 								playlistName: "ownerOfThisPlaylistArray"
 								}];
 
