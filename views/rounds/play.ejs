@@ -10,91 +10,124 @@
 	<input type="hidden" id="playlistId" value="<%= playlist.playlistId %>">
 </form>
 
-<!-- Heading -->
-<div class="ui list">
-	<div class="item">
 
-		
-		<div class="right floated">
-			<a href="/logout">
-				<button class="ui toggle button red">Logout</button>
-			</a>
-		</div>
-		<h2>Spotify Challenge Guessing Game</h2>
-		<div class="right floated">Logged in currently as <%= user.fullName %></div>
+<div id="wrapper">
 
-	</div> <!-- close item class -->
-</div>
+<div id="centercontainer">
 
-<!-- back button -->
-<a href="/users/<%= user.spotifyId %>"><button style="background-color:white" class="ui button clear right floated">Back to playlists</button></a>
+	<!-- Heading -->
+	<div class="ui menu">
 
-<h1>Play game!!!!</h1>
-<p>Guess the song name or artist name. Hurry, you only have 30 seconds!</p>
+		<div class="left menu">
+			<div class="item">
+				<h2>Spotify Challenge Guessing Game</h2>
+			</div>
+		</div> <!-- close left menu -->
 
-<div id="leftContainer">
+		<div class="right menu">
+
+			<div class="item" style="color:#1B1B1B">
+				<span style="font-size:.9em"> Logged in currently as <%= user.fullName %> </span>
+			</div>
+			<div class="item">
+				<img src="<%= user.imageUrl %>" height="150px" width="160px" class="ui circular image tiny" style="display:inline">
+			</div>
+			<div class="item">
+				<a href="/logout">
+					<button class="ui toggle button red" style="text-decoration:none">Logout</button>
+				</a>
+			</div>
+
+		</div> <!-- close right menu -->
+
+	</div> <!-- close heading / ui menu -->
+
+	<div>
+
+		<!-- back button -->
+		<a href="/users/<%= user.spotifyId %>"><button style="background-color:white; margin-right:20px" class="ui button clear right floated">Back to playlists</button></a>
+
+		<h3>Play game!!!!</h3>
+		<p style="padding:20px">Guess the song name or artist name. Hurry, you only have 30 seconds!</p>
+
+	</div>
+
+	<div class="ui clearing divider"></div>
 
 	<!-- start & 'play again' button -->
-	<div id="divStartGame">
+	<div id="divStartGame" class="ui center aligned segment">
 		<form id="startGameForm" action="/othertest">
 			<input type="submit" value="Play!" class="ui button large green" id="startButton">
 		</form>
 	</div>
+	
+	<div id="leftContainer">
 
-	<!-- audio tag for playing song previews-->
-	<div>
-		<audio id="audioPreviewUrl" src="" alt=""></audio>
-	</div>
+		<!-- audio tag for playing song previews-->
+		<div>
+			<audio id="audioPreviewUrl" src="" alt=""></audio>
+		</div>
 
-	<!-- user guess input form -->
-	<div id="divUserInputGuess">
-		<form id="inputGuessForm" action="/test">
-			<div>
-				<label for="userInputGuess">Guess the song name or artist: </label>
-				<input type="text" name="userInputGuess" placeholder="??????" class="textField" id="userInputGuess">
-			</div>
-			<div>
-				<input type="submit" value="Guess" class="ui button large green">
-			</div>
-		</form>
-	</div>
+		<!-- user guess input form -->
+		<div id="divUserInputGuess">
+			<form id="inputGuessForm" action="/test" class="ui form">
+				<div>
+					<label for="userInputGuess">Guess the song name or artist: </label>
+					<input type="text" name="userInputGuess" placeholder="??????" class="field" id="userInputGuess" style="margin-top:10px">
+				</div>
+				<div>
+					<input type="submit" value="Guess" class="ui button large green" style="margin-top:20px">
+				</div>
+			</form>
+		</div>
 
-	<!-- song results -->
-	<div id="divSongResults">
-		<ul id="pSongResults"></ul>
-	</div>
-
-
-</div> <!-- close div leftContainer -->
+		<!-- song results - for album artwork only -->
+		<div id="divSongResultsLeft">
+			<ul id="pSongResultsLeft"></ul>
+		</div>
 
 
-<div id="rightContainer">
+	</div> <!-- close div leftContainer -->
 
-<!-- song number -->
-	<div id="divSongCount">
-		<ul>
-			<li id="songCount"></li>
-		</ul>
-	</div>
 
-	<!-- countdown -->
-	<div id="countdown">
-		<ul>
-			<li id="countdownTimerHeader"></li>
-			<li id="countdownTimer"></li>
-		</ul>
-	</div>
 
-	<!-- score -->
-	<div id="divScore">
-		<ul>
-			<li>Your score is:</li>
-			<li id="numCorrect"></li>
-			<li id="numIncorrect"></li>
-		</ul>
-	</div>
+	<div id="rightContainer">
 
-</div> <!-- close div rightContainer -->
+	<!-- song number -->
+		<div id="divSongCount">
+			<ul>
+				<li id="songCount"></li>
+			</ul>
+		</div>
+
+		<!-- countdown -->
+		<div id="countdown">
+			<ul>
+				<li id="countdownTimerHeader"></li>
+				<li id="countdownTimer" style="font-size:2.5em"></li>
+			</ul>
+		</div>
+
+		<!-- score -->
+		<div id="divScore">
+			<ul>
+				<li>Your score is:</li>
+				<li id="numCorrect"></li>
+				<li id="numIncorrect"></li>
+			</ul>
+		</div>
+
+		<!-- song results - for text only -->
+		<div id="divSongResultsRight">
+			<ul id="pSongResultsRight"></ul>
+		</div>
+
+	</div> <!-- close div rightContainer -->
+
+
+</div> <!-- close centercontainer -->
+
+</div> <!-- close wrapper -->
 
 
 <!-- bring in custom js scripts for this page -->

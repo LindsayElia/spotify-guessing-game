@@ -10,8 +10,8 @@ $(function() {
 	var $playlistId = $("#playlistId");
 	var currentPlaylist = $playlistId.val();
 
-	var $divSongResults = $("#divSongResults");
-
+	var $divSongResultsLeft = $("#divSongResultsLeft");
+	var $divSongResultsRight = $("#divSongResultsRight");
 
 	var songsArray = [];
 
@@ -66,7 +66,8 @@ $(function() {
 	var $inputGuessForm = $("#inputGuessForm");
 	var $countdown = $("#countdown");
 	var $divScore = $("#divScore");
-	var $pSongResults = $("#pSongResults");
+	var $pSongResultsLeft = $("#pSongResultsLeft");
+	var $pSongResultsRight = $("#pSongResultsRight");
 	var dataSpotify;
 	var $userInputGuess = $("#userInputGuess");
 	var scoreCorrect = 0;
@@ -83,7 +84,8 @@ $(function() {
 
 	// hide parts of the page on inital page load
 	$divUserInputGuess.hide();
-	$divSongResults.hide();
+	$divSongResultsLeft.hide();
+	$divSongResultsRight.hide();
 	$divScore.hide();
 	$divSongCount.hide();
 	$countdown.hide();
@@ -128,7 +130,8 @@ $(function() {
 				$startGameForm.hide();
 				$userInputGuess.val(" "); 	// clear the text in the guess input
 				$divUserInputGuess.show();
-				$divSongResults.hide();
+				$divSongResultsLeft.hide();
+				$divSongResultsRight.hide();
 				$divScore.hide();
 
 				// show how many guesses they have left
@@ -150,7 +153,7 @@ $(function() {
 					}
 					else {
 						$countdownTimerHeader.html("Seconds left to guess:");
-						$countdownTimer.html(timeLeft);
+						$countdownTimer.html("<h1>" + timeLeft + "</h1>");
 						// console.log(timeLeft)
 						timeLeft--;
 					}
@@ -180,12 +183,11 @@ $(function() {
 		event.preventDefault();
 		console.log("#divUserInputGuess submitted");
 
-		$pSongResults.html( "<li><img src='" + dataSpotify.track.artworkUrl + "'>" +
+		$pSongResultsLeft.html( "<li><img src='" + dataSpotify.track.artworkUrl + "'></li>");
 
-/// add artist name for ALL artists
-							"<li>Artist(s): " + allCurrentArtists + "</li>" + 
-							"<li>Song title: " + dataSpotify.track.title + "</li>" +
-							"<li>Album: " + dataSpotify.track.album + "</li>");
+		$pSongResultsRight.html( "<li><b>Artist(s):</b> " + allCurrentArtists + "</li>" + 
+							"<li><b>Song title:</b> " + dataSpotify.track.title + "</li>" +
+							"<li><b>Album:</b> " + dataSpotify.track.album + "</li>");
 
 		// stop music from playing
 		$audioPreviewUrl[0].pause();
@@ -193,13 +195,15 @@ $(function() {
 		// hide the guess button, show the song results
 		$divUserInputGuess.hide();
 
-		$divSongResults.show();
+		$divSongResultsLeft.show();
+		$divSongResultsRight.show();
 		$startButton.val("Play again");
 		$startGameForm.show();
 		$divSongCount.show();
 		$countdown.hide();
 		timeLeft = 0; // clear the countdown timer so it doesn't show both timers if the user guesses before the time is up
-		
+
+
 		// check user's guess against song results
 		var guessAsIs = $userInputGuess.val();
 		var guessLowerCased = guessAsIs.toLowerCase();

@@ -1,11 +1,12 @@
 @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic);
 
-body {
-	font-size: .9em;
+html, body {
+	font-size: 1em;
 	font-family: sans-serif;
 	padding: 0;
 	margin: 0;
 	color: #1B1B1B;   /* spotify darker black */
+	height: 100%;
 }
 
 /* begin button styles */
@@ -68,7 +69,8 @@ ul, li {
 	background-color: #2EBD59;		/* spotify pop of green */
 }
 
-h2 {
+
+h1, h2 {
 	color: #2EBD59;		/* spotify pop of green */
 }
 
@@ -100,7 +102,10 @@ h4 {
 	display:none;
 }
 
-
+.ui.segment {
+	background-color: #F8F8F8; /* spotify mid-gray/white */
+	box-shadow: none;
+}
 
 /* spotify website colors
 dark blue - #1B273B

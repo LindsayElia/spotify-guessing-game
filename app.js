@@ -211,12 +211,16 @@ app.get('/callback', function(req, res) {
 						})
 						.then(function(playlistData){
 // format the data how we want it, for saving in our db
-							// console.log("all playlist data: ", playlistData.body);
-							// console.log("playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
-							// console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
+							console.log("all playlist data: -- items ", playlistData.body.items);
+							console.log("looking for owner id -- playlistData.body.items[0].owner.id: ", playlistData.body.items[0].owner.id);
+							console.log("playlist 1 of 3: ", playlistData.body.items[0].id);
 							// console.log("playlist 2 of 3: ", playlistData.body.items[1].id);
 							// console.log("playlist 3 of 3: ", playlistData.body.items[2].id);
 
+// I'm saving the wrong thing here
+// it's saving the owner of the playlist,
+// but it's a playlist i'm following that someone else owns,
+// so it associates the data with a different player in my db
 							var playlistsArray = [{
 								playlistId: playlistData.body.items[0].owner.id,
 								playlistName: "ownerOfThisPlaylistArray"
@@ -234,11 +238,18 @@ app.get('/callback', function(req, res) {
 						})
 						.then(function(playlistsArray){
 // save playlists in user database
-							// console.log("new function returning playlistsArray: ", playlistsArray);
+
+//
+// check this one...
+// may not be saving correctly
+//
+							console.log("new function returning playlistsArray: ", playlistsArray);
 							var user = {};
 							user.spotifyId = playlistsArray.shift().playlistId;
-							// console.log("hiiiiiii user.spotifyId", user.spotifyId);
+							console.log("hiiiiiii user.spotifyId ", user.spotifyId);
+							console.log("hiiiiiii playlistsArray ", playlistsArray);
 							user.playlistIds = playlistsArray;
+							console.log("hiiiiiii user.playlistIds ", user.playlistIds);
 							// save playlist Ids to user in user database (both playlist ids and names)
 							db.User.findOneAndUpdate({spotifyId:user.spotifyId}, user, {new: true, upsert: true}, function(err, user){
 								if(err){
@@ -258,7 +269,7 @@ app.get('/callback', function(req, res) {
 							// save playlist ids to playlist database
 							// for each item in playlistsArray, save it as the playlistId for a new Playlist document
 
-	// EDIT LATER - saving user id as a playlist for now...can remove & re-add later if I want to
+// EDIT LATER - saving user id as a playlist for now...can remove & re-add later if I want to
 
 							for (var i = 0; i < playlistsArray.length; i++){
 								var playlist = {};
@@ -277,6 +288,7 @@ app.get('/callback', function(req, res) {
 
 							return playlistsArray;
 						})
+
 
 //************
 
@@ -299,6 +311,11 @@ app.get('/callback', function(req, res) {
 								var trackInfo;
 								var trackInfoAll;
 // get track info for all tracks
+
+//
+// check this one - not finding track by the info I'm giving it...
+//
+
 								spotifyApi.getPlaylistTracks(spotifyId, thisTrack, {limit:100}, function(err, data){
 									if(err){
 										console.log("seriously?");
@@ -306,6 +323,7 @@ app.get('/callback', function(req, res) {
 									}
 									
 									else if (data.body.total !== 0) {
+										console.log("tracks for playlist found in spotify api");
 										// console.log("all data.body.totalss ", data.body);
 										    // console.log("data.body NOT/YES items: ", data.body.items);
 										    for(var t = 0; t < data.body.items.length; t++){
@@ -438,7 +456,9 @@ app.get("/users/redirect", routeHelper.ensureSameSpotifyUser, function(req, res)
 // show user's bio, friends, and playlists
 app.get("/users/:spotifyId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
 	db.User.findOne({spotifyId:req.params.spotifyId}, function(err, user){
-		// console.log("get /users findOne is running");
+		console.log("get /users findOne is running");
+		console.log("user data for this user is...", user);
+		console.log("user data in playlists array...", user.playlistIds);
 		if(err){
 			console.log(err, "error in getting /users/:spotifyId route");
 			res.render("errors/500");

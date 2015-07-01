@@ -8,13 +8,13 @@ $(function() {
 
 	var $spotifyId = $("#spotifyId");
 	var destinationId = $spotifyId.val();
-
+	console.log(destinationId, "destinationId");
 
 	function loadPlaylists(){
 		$.getJSON("/users/" + destinationId)
 			.done(function(userData, status){
 				console.log(userData, "data inside of loadPlaylists getJSON call");
-				// console.log(status, "status inside of loadPlaylists getJSON call");
+				console.log(status, "status inside of loadPlaylists getJSON call");
 
 				// display the playlist info on page
 				for (var i = 0; i < userData.user.playlistIds.length; i++){
@@ -23,11 +23,11 @@ $(function() {
 					currentPlaylist = userData.user.playlistIds[i].playlistId;
 
 					$.getJSON("/playlists/" + currentPlaylist)
-
 						.done(function(playlistData, status){
 							console.log(playlistData, "data inside of /playlists/:playlistId call");
 
-							if (playlistData.playlist.trackIds.length > 0) {
+							if (playlistData.user.playlistIds.length > 0) {
+							console.log("inside of if loop");
 								$showPlaylists.append("<div class='item'>" + 
 									"<div class='right floated'><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId + 
 									"'><button class='ui icon button green'>Pick Me<i class='music icon large'></i></button></a></div>" + 
