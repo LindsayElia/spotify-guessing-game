@@ -1,9 +1,13 @@
 <!-- display a single user's bio & game info -->
 <% include ../partials/header %>
 
+<!-- hidden -->
+<form>
+	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
+</form>
+
 
 <div id="wrapper">
-
 
 <div id="centercontainer">
 
@@ -14,7 +18,7 @@
 			<div class="item">
 				<h2>Spotify Challenge Guessing Game</h2>
 			</div>
-		</div>
+		</div> <!-- close left menu -->
 
 		<div class="right menu">
 
@@ -34,9 +38,6 @@
 
 	</div> <!-- close heading / ui menu -->
 
-	<form>
-		<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
-	</form>
 
 
 	<h3>Choose a playlist to guess songs from that playlist.</h3>
