@@ -1,30 +1,43 @@
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic);
+
 body {
+	font-size: .9em;
 	font-family: sans-serif;
-	background-color: azure;
-	font-size: 1em;
+	padding: 0;
+	margin: 0;
+	color: #1B1B1B;   /* spotify darker black */
 }
 
 /* begin button styles */
-.button {
-	font-size: 1em;
-	background-color: seashell;
-	border-radius: 8px;
-	padding: 6px 10px;
-	margin: 10px;
+/* being over-ridden by Semantic UI */
+	.button {
+/*		font-size: 1em;	*/
+		background-color: seashell; 
+		border-radius: 8px;
+		padding: 6px 10px;
+		margin: 10px;
+	}
+
+	.logout {
+		background-color: tomato;
+	}
+
+	.submitAction {
+		background-color: greenyellow;
+	}
+
+	.home {
+		background-color: aquamarine;
+	}
+
+
+.ui.button.clear {
+	background-color: seashell; 
+	border: 1px black solid;
 }
 
-.logout {
-	background-color: tomato;
-}
-
-.submitAction {
-	background-color: greenyellow;
-}
-
-.home {
-	background-color: aquamarine;
-}
 /* end button styles */
+
 
 .textField {
 	font-size: 1em;
@@ -42,8 +55,67 @@ ul, li {
 
 .border {
 	border: 1px solid gray;
-	margin: 5px;
+	margin: 20px;
 	padding: 10px;
 }
+
+/* overrid semantic UI colors for li's */
+.ui.selection.list .list>.item, .ui.selection.list>.item {
+	color: #1B1B1B;		/* spotify darker black */ 
+}
+
+.ui.green.button, .ui.green.buttons {
+	background-color: #2EBD59;		/* spotify pop of green */
+}
+
+h2 {
+	color: #2EBD59;		/* spotify pop of green */
+}
+
+h3 {
+	display: inline;
+	padding: 40px;
+	color: #1B1B1B;		/* spotify darker black */
+	padding-bottom: 
+}
+
+h4 {
+	color: #1B1B1B;		/* spotify darker black */
+
+}
+
+#wrapper {
+	background-color: #1B273B;  /* spotify dark blue */
+	padding: 0 4% 0 4%;
+	height: 100%;
+}
+
+#centercontainer {
+	background-color: #F8F8F8; /* spotify mid-gray/white */
+	padding: 0 0 4% 0;
+	height: 100%;
+}
+
+.ui.menu .left .item:before {
+	display:none;
+}
+
+
+
+/* spotify website colors
+dark blue - #1B273B
+mid-gray/white - #F8F8F8
+bright white - #FFFFFF
+pop of green - #2EBD59
+black on buttons - #2E2F33
+darker black for navigation - #1B1B1B (use sparinglye)
+medium black/gray - #262626
+
+
+*/
+
+
+
+
 
 

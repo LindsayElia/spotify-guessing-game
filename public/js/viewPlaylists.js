@@ -28,10 +28,11 @@ $(function() {
 							console.log(playlistData, "data inside of /playlists/:playlistId call");
 
 							if (playlistData.playlist.trackIds.length > 0) {
-								$showPlaylists.append("<ul><li>Playlist: " + 
-								playlistData.playlist.playlistName + 
-								"</li><li># of songs: " + playlistData.playlist.trackIds.length +
-								"</li><li><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId +"'><button class='button'>Pick Me</button></a></li></ul>");		
+								$showPlaylists.append("<div class='item'>" + 
+									"<div class='right floated'><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId + 
+									"'><button class='ui icon button green'>Pick Me<i class='music icon large'></i></button></a></div>" + 
+									"<div>Playlist: " + playlistData.playlist.playlistName + "</div>" + 
+									"<div># of songs: " + playlistData.playlist.trackIds.length + "</div></div>");		
 							}
 						})
 						.fail(function(){

@@ -10,14 +10,24 @@
 	<input type="hidden" id="playlistId" value="<%= playlist.playlistId %>">
 </form>
 
-<!-- Logout button -->
-<div>
-	Logged in currently as <%= user.fullName %>  	
-	<a href="/logout"><button class="button logout">Logout</button></a>
+<!-- Heading -->
+<div class="ui list">
+	<div class="item">
+
+		
+		<div class="right floated">
+			<a href="/logout">
+				<button class="ui toggle button red">Logout</button>
+			</a>
+		</div>
+		<h2>Spotify Challenge Guessing Game</h2>
+		<div class="right floated">Logged in currently as <%= user.fullName %></div>
+
+	</div> <!-- close item class -->
 </div>
 
 <!-- back button -->
-<a href="/users/<%= user.spotifyId %>"><button class="button">Back to playlists</button></a>
+<a href="/users/<%= user.spotifyId %>"><button style="background-color:white" class="ui button clear right floated">Back to playlists</button></a>
 
 <h1>Play game!!!!</h1>
 <p>Guess the song name or artist name. Hurry, you only have 30 seconds!</p>
@@ -27,7 +37,7 @@
 	<!-- start & 'play again' button -->
 	<div id="divStartGame">
 		<form id="startGameForm" action="/othertest">
-			<input type="submit" value="start" class="button" id="startButton">
+			<input type="submit" value="Play!" class="ui button large green" id="startButton">
 		</form>
 	</div>
 
@@ -44,7 +54,7 @@
 				<input type="text" name="userInputGuess" placeholder="??????" class="textField" id="userInputGuess">
 			</div>
 			<div>
-				<input type="submit" value="Guess" class="button">
+				<input type="submit" value="Guess" class="ui button large green">
 			</div>
 		</form>
 	</div>

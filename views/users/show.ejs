@@ -1,29 +1,58 @@
 <!-- display a single user's bio & game info -->
 <% include ../partials/header %>
 
-<div>
-	Logged in currently as <%= user.fullName %>  	
-	<a href="/logout"><button class="button logout">Logout</button></a>
-</div>
 
-<form>
-	<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
-</form>
+<div id="wrapper">
 
 
-<div>
-	<img src="<%= user.imageUrl %>" height="150px" width="160px">
-</div>
+<div id="centercontainer">
 
-<h2>Choose a playlist to guess songs from that playlist.</h2>
+	<!-- Heading -->
+	<div class="ui menu">
 
-<div class="border">
-	<p>Current (non-empty) playlists, created by you:</p>
-	<p id="showPlaylists"></p>
-</div>
+		<div class="left menu">
+			<div class="item">
+				<h2>Spotify Challenge Guessing Game</h2>
+			</div>
+		</div>
 
-	
-	
+		<div class="right menu">
+
+			<div class="item" style="color:#1B1B1B">
+				<span> Logged in currently as <%= user.fullName %> </span>
+			</div>
+			<div class="item">
+				<img src="<%= user.imageUrl %>" height="150px" width="160px" class="ui circular image tiny" style="display:inline">
+			</div>
+			<div class="item">
+				<a href="/logout">
+					<button class="ui toggle button red" style="text-decoration:none">Logout</button>
+				</a>
+			</div>
+
+		</div> <!-- close right menu -->
+
+	</div> <!-- close heading / ui menu -->
+
+	<form>
+		<input type="hidden" id="spotifyId" value="<%= user.spotifyId %>">
+	</form>
+
+
+	<h3>Choose a playlist to guess songs from that playlist.</h3>
+
+	<div class="border">
+		<h4>Current (non-empty) playlists, created by you:</h4>
+		<div id="showPlaylists" class="ui divided selection list"></div>
+	</div>
+
+
+
+</div> <!-- close centercontainer -->
+
+</div> <!-- close wrapper -->
+
+
 
 <!-- bring in custom js scripts for this page -->
 <script type="text/javascript" src="/js/viewPlaylists.js"></script>

@@ -56,8 +56,8 @@ var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 // _______EDIT THIS BEFORE DEPLOYING TO HEROKU/PRODUCTION_______
 
 // will need to edit this for production:
-// var redirect_uri = "http://localhost:3000/callback";		// development URL
-var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback";		// production URL
+var redirect_uri = "http://localhost:3000/callback";		// development URL
+// var redirect_uri = "https://spotify-guessing-game.herokuapp.com/callback"; // production URL
 
 
 // Generates a random string containing numbers and letters
@@ -420,8 +420,7 @@ app.get("/index", function(req, res){
 	res.render("users/index", {req:req});
 });
 
-//_______LOGOUT_______
-
+// LOGOUT
 app.get("/logout", function(req, res){
 	req.logout();
 	res.redirect("/index");
@@ -484,7 +483,7 @@ app.get("/playlists/:playlistId", function(req, res){
 	});
 });
 
-//_______ROUNDS ROUTES_______
+//_______PLAY GAME ROUTES_______
 
 // PLAY - GET "play" for current user and current playlist
 app.get("/users/:spotifyId/play/:playlistId", routeHelper.ensureSameSpotifyUserLoggedIn, function(req, res){
