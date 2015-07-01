@@ -106,6 +106,10 @@ $(function() {
 				dataSpotify = fullTrackData;
 				console.log(dataSpotify, "dataSpotify");
 
+				if (dataSpotify.track.previewUrl === null){
+					alert("sorry this song does not have a preview available, please click through to the next song");
+				} 
+
 				// load audio
 				$audioPreviewUrl.attr("src", dataSpotify.track.previewUrl);
 				// play the song
@@ -173,6 +177,8 @@ $(function() {
 
 		// increase the counter to move to next trackId in songsArray
 		counter = counter + 1;
+		// reset current artists array to an empty string
+		allCurrentArtists = "";
 
 	});
 
