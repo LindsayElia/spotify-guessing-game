@@ -30,10 +30,11 @@ $(function() {
 							if (playlistData.playlist.trackTitlesAndIds.length > 0) {
 							console.log("inside of if loop");
 								$showPlaylists.append("<div class='item'>" + 
-									"<div class='right floated'><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId + 
-									"'><button class='ui icon button green'>Pick Me<i class='music icon large'></i></button></a></div>" + 
 									"<div>Playlist: " + playlistData.playlist.playlistName + "</div>" + 
-									"<div># of songs: " + playlistData.playlist.trackTitlesAndIds.length + "</div></div>");		
+									"<div># of songs: " + playlistData.playlist.trackTitlesAndIds.length + "</div>" +
+									"<div class='float-aside'><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId + 
+									"'><button class='ui icon button green'>Pick Me<i class='music icon large'></i></button></a></div>" +
+									"</div>");		
 							}
 						})
 						.fail(function(){

@@ -1,5 +1,22 @@
+/*  COLOR PALETTE - FROM SPOTIFY WEBSITE
+
+dark blue - #1B273B
+mid-gray/white - #F8F8F8
+bright white - #FFFFFF
+pop of green - #2EBD59
+black on buttons - #2E2F33
+darker black for navigation - #1B1B1B (use sparinglye)
+medium black/gray - #262626
+
+*/
+
+/* bring in google font */
 @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic);
 
+
+/* GLOBAL STYLES */
+
+/* set all elements to size to their box size, no margins or padding by default, to be the same in all browsers */
 * {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
@@ -15,66 +32,20 @@ html, body {
 	height: 100%;
 }
 
-/* begin button styles */
-/* being over-ridden by Semantic UI */
-	.button {
-/*		font-size: 1em;	*/
-		background-color: seashell; 
-		border-radius: 8px;
-		padding: 6px 10px;
-		margin: 10px;
-	}
-
-	.logout {
-		background-color: tomato;
-	}
-
-	.submitAction {
-		background-color: greenyellow;
-	}
-
-	.home {
-		background-color: aquamarine;
-	}
-
-
-.ui.button.clear {
-	background-color: seashell; 
-	border: 1px black solid;
-}
-
-/* end button styles */
-
-
-.textField {
-	font-size: 1em;
-}
-
-ul, li {
-	list-style: none;
-}
-
-#leftContainer, #rightContainer {
-	float: left;
-	padding: 3%;
-	width: 44%;
+/* Firefox only */
+@-moz-document url-prefix() { 
+  body {
+     margin-top: -30px;
+     padding-top: 12px;
+  }
 }
 
 .border {
 	border: 1px solid gray;
-	margin: 20px;
 	padding: 10px;
+	width: 95%;
+	margin: 20px auto;
 }
-
-/* overrid semantic UI colors for li's */
-.ui.selection.list .list>.item, .ui.selection.list>.item {
-	color: #1B1B1B;		/* spotify darker black */ 
-}
-
-.ui.green.button, .ui.green.buttons {
-	background-color: #2EBD59;		/* spotify pop of green */
-}
-
 
 h1, h2 {
 	color: #2EBD59;		/* spotify pop of green */
@@ -84,7 +55,6 @@ h3 {
 	display: inline;
 	padding: 20px;
 	color: #1B1B1B;		/* spotify darker black */
-	padding-bottom: 
 }
 
 h4 {
@@ -92,10 +62,75 @@ h4 {
 
 }
 
+h5 {
+	font-size:.9em;
+	color:#1B1B1B;		/* spotify darker black */
+	font-weight: normal;
+}
+
+/* used for 'pick me' buttons on playlists index page */
+div.float-aside {
+	float: right;
+	margin-top: -40px;
+}
+
+
+/* SPECIFIC STYLES */
+
+/* button styles (some of these override Semantic UI styling) */
+.button {
+	background-color: seashell; 
+	border-radius: 8px;
+	padding: 6px 10px;
+	margin: 10px;
+}
+
+.logout {
+	background-color: tomato;
+}
+
+.submitAction {
+	background-color: greenyellow;
+}
+
+.home {
+	background-color: aquamarine;
+}
+
+.ui.button.clear {
+	background-color: seashell; 
+	border: 1px black solid;
+}
+
+.ui.green.button, .ui.green.buttons {
+	background-color: #2EBD59;		/* spotify pop of green */
+}
+
+
+/* form inputs */
+.textField {
+	font-size: 1em;
+}
+
+
+/* list items */
+ul, li {
+	list-style: none;
+}
+
+/* playlist list items (override semantic UI colors) */
+.ui.selection.list .list>.item, .ui.selection.list>.item {
+	color: #1B1B1B;		/* spotify darker black */
+}
+
+
+/* layout - sections */
 #wrapper {
 	background-color: #1B273B;  /* spotify dark blue */
 	/*padding: 0 4% 0 4%;*/
-	height: 100%;
+	height: 120%;
+/*	margin-top: -10px;
+	padding-top: 8px;*/
 }
 
 #centercontainer {
@@ -107,26 +142,99 @@ h4 {
 	margin: 0 auto;
 }
 
-.ui.menu .left .item:before {
-	display:none;
+#leftContainer, #rightContainer {
+	float: left;
+	padding: 3%;
+	width: 44%;
 }
 
+/* section bar to divide top areas of page from lower area of page*/
 .ui.segment {
 	background-color: #F8F8F8; /* spotify mid-gray/white */
 	box-shadow: none;
 }
 
-/* spotify website colors
-dark blue - #1B273B
-mid-gray/white - #F8F8F8
-bright white - #FFFFFF
-pop of green - #2EBD59
-black on buttons - #2E2F33
-darker black for navigation - #1B1B1B (use sparinglye)
-medium black/gray - #262626
+/* menus */
+.ui.menu .left .item:before {
+	display:none;
+}
+
+/* user icon in lieu of avatar */
+i.user.icon.large.green {
+	opacity:1;
+	display:inline;
+	margin:0;
+}
 
 
-*/
+/* RESPONSIVE WINDOW SIZING */
+
+/* for medium sizes, like ipads, and smaller browser windows */
+@media screen and (max-width:800px) {
+
+	/* right menu container */
+	.ui.menu:not(.vertical) .menu.right {
+		clear: left;
+		float: left;
+	}
+
+	.ui.list {
+		font-size: .9em;
+	}
+
+	/* font sizes */
+	h2 {
+		font-size: 1.5em;
+	}
+
+	h3 {
+		font-size: 1.2em;
+		font-weight: 700;
+	}
+
+	h4 {
+		font-size: .9em;
+		font-weight: 700;
+	}
+
+	/* move 'pick me buttons' to be below playlist names */
+	div.float-aside {
+		float: none;
+		margin-top: 8px;
+		margin-bottom: 8px;
+	}
+
+	#centercontainer {
+		max-width: 760px;
+		min-width: 551px;
+	}
+
+}
+
+/* for smallest sizes, like phones */
+/* mid-size styles still apply unless overridden here */
+@media screen and (max-width:550px) {
+
+	/* items in right menu */
+	.ui.menu .item {
+		display: block;
+	}
+	
+	/* font sizes */
+	html, body {
+		font-size: .9em;
+	}
+
+	#centercontainer {
+		max-width: 520px;
+		min-width: 250px;
+	}
+
+	h3 {
+		display: block;
+	}
+
+}
 
 
 
