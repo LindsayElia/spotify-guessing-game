@@ -10,7 +10,6 @@
 	<input type="hidden" id="playlistId" value="<%= playlist.playlistId %>">
 </form>
 
-
 <div id="wrapper">
 
 <div id="centercontainer">
@@ -29,7 +28,7 @@
 		<a href="/users/<%= user.spotifyId %>"><button style="background-color:white; margin-right:20px" class="ui button clear right floated">Back to playlists</button></a>
 
 		<h3>Play game!!!!</h3>
-		<p style="padding:20px">Guess the song name or artist name. Hurry, you only have 30 seconds!</p>
+		<p class="spacey">Guess the song name or artist name. Hurry, you only have 30 seconds!</p>
 
 	</div>
 
@@ -68,9 +67,7 @@
 			<ul id="pSongResultsLeft"></ul>
 		</div>
 
-
 	</div> <!-- close div leftContainer -->
-
 
 
 	<div id="rightContainer">
@@ -110,7 +107,6 @@
 </div> <!-- close centercontainer -->
 
 </div> <!-- close wrapper -->
-
 
 <!-- bring in custom js scripts for this page -->
 <script type="text/javascript" src="/js/playGame.js"></script>

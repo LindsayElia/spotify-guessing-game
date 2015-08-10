@@ -33,12 +33,13 @@ html, body {
 }
 
 /* Firefox only */
-@-moz-document url-prefix() { 
-  body {
-     margin-top: -30px;
-     padding-top: 12px;
-  }
-}
+/* not working on login page and error pages, not sure why? */
+ @-moz-document url-prefix() {
+	body {
+		margin-top: -30px;
+		padding-top: 12px;
+	}
+} 
 
 .border {
 	border: 1px solid gray;
@@ -74,6 +75,9 @@ div.float-aside {
 	margin-top: -40px;
 }
 
+.spacey {
+	margin: 30px 20px;
+}
 
 /* SPECIFIC STYLES */
 
