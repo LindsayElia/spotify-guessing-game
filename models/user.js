@@ -26,7 +26,7 @@ var userSchema = new mongoose.Schema({
 	},
 	fullName: String,
 	userUrl: String,
-	imageUrl: String,
+	userImageUrl: String,
 	followersHref: String,
 	genres: [],
 	numCorrect: Number,

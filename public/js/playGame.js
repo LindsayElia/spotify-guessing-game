@@ -29,7 +29,7 @@ $(function() {
 			.done(function(songData, status){
 				console.log(songData, "data inside of loadTracks getJSON call");
 
-				var tracksArr = songData.playlist.trackIds;
+				var tracksArr = songData.playlist.trackTitlesAndIds;
 				console.log(tracksArr, "tracksArr");
 
 				for (var i = 0; i < tracksArr.length; i++ ) {

@@ -5,10 +5,10 @@ var trackSchema = new mongoose.Schema({
 	trackId: {
 		type: String,
 		unique: true
-	},
-	spotifyId: String,
+	},					// tracks are not associated with playlists or users here in the tracks model,
+						// because we are referencing them from the playlist model
 	title: String,
-	artist: Array,  // spotify sends this out as an array
+	artist: Array,  	// spotify sends this out as an array
 	album: String,
 	artworkUrl: String,
 	previewUrl: String,

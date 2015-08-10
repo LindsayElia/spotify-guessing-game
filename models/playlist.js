@@ -7,7 +7,7 @@ var playlistSchema = new mongoose.Schema({
 		unique: true
 	},
 	playlistName: String,
-	trackIds: []		// songs with track-title & track-id
+	trackTitlesAndIds: []		// songs with track-title & track-id
 });
 
 var Playlist = mongoose.model("Playlist", playlistSchema);

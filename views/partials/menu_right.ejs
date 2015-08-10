@@ -1,0 +1,19 @@
+<div class="right menu">
+
+	<div class="item" style="color:#1B1B1B">
+		<span style="font-size:.9em"> Logged in currently as <%= user.spotifyId %> </span>
+	</div>
+	<div class="item">
+		<% if (user.userImageUrl == null){ %>
+			<i class="user icon large green" style="opacity:1;display:inline;margin:0;"></i>
+		<% } else { %>
+			<img src="<%= user.userImageUrl %>" height="150px" width="160px" class="ui circular image tiny" style="display:inline">
+		<% } %>	
+	</div>
+	<div class="item">
+		<a href="/logout">
+			<button class="ui toggle button red" style="text-decoration:none">Logout</button>
+		</a>
+	</div>
+
+</div> <!-- close right menu -->

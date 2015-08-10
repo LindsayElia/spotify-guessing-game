@@ -14,36 +14,18 @@
 	<!-- Heading -->
 	<div class="ui menu">
 
-		<div class="left menu">
-			<div class="item">
-				<h2>Spotify Challenge Guessing Game</h2>
-			</div>
-		</div> <!-- close left menu -->
-
-		<div class="right menu">
-
-			<div class="item" style="color:#1B1B1B">
-				<span style="font-size:.9em"> Logged in currently as <%= user.fullName %> </span>
-			</div>
-			<div class="item">
-				<img src="<%= user.imageUrl %>" height="150px" width="160px" class="ui circular image tiny" style="display:inline">
-			</div>
-			<div class="item">
-				<a href="/logout">
-					<button class="ui toggle button red" style="text-decoration:none">Logout</button>
-				</a>
-			</div>
-
-		</div> <!-- close right menu -->
+		<% include ../partials/menu_left %>
+		<% include ../partials/menu_right %>
 
 	</div> <!-- close heading / ui menu -->
 
 
 
 	<h3>Choose a playlist to guess songs from that playlist.</h3>
+	<i class="user icon large green"></i>
 
 	<div class="border">
-		<h4>Current (non-empty) playlists:</h4>
+		<h4>Current (non-empty) playlists, created by you:</h4>
 		<div id="showPlaylists" class="ui divided selection list"></div>
 	</div>
 

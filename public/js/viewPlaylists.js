@@ -27,13 +27,13 @@ $(function() {
 						.done(function(playlistData, status){
 							console.log(playlistData, " - playlistData - data inside of /playlists/:playlistId call");
 
-							if (playlistData.playlist.trackIds.length > 0) {
+							if (playlistData.playlist.trackTitlesAndIds.length > 0) {
 							console.log("inside of if loop");
 								$showPlaylists.append("<div class='item'>" + 
 									"<div class='right floated'><a href='/users/" + destinationId + "/play/" + playlistData.playlist.playlistId + 
 									"'><button class='ui icon button green'>Pick Me<i class='music icon large'></i></button></a></div>" + 
 									"<div>Playlist: " + playlistData.playlist.playlistName + "</div>" + 
-									"<div># of songs: " + playlistData.playlist.trackIds.length + "</div></div>");		
+									"<div># of songs: " + playlistData.playlist.trackTitlesAndIds.length + "</div></div>");		
 							}
 						})
 						.fail(function(){
