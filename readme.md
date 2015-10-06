@@ -1,3 +1,28 @@
+#### Project description
+
+This is a a game where Spotify users can login using their Spotify accounts and guess songs from random selections of their own playlists.
+
+#### Demo the App
+
+You can try out the application at [http://spotify-guessing-game.herokuapp.com/](http://spotify-guessing-game.herokuapp.com/). It is currently still in development.
+
+#### Technologies used
+
+- Front end: JavaScript, HTML, CSS, jQuery
+- Back End: NodeJS, ExpressJS, Mongoose, MongoDB, JavaScript
+
+#### API integrations
+
+- Spotify
+
+#### Future Features
+
+- Let players challenge their friends to guess against their own playlists
+- Leaderboard to show scores for all users
+
+
+----
+
 # Full Stack JavaScript Project
 
 ## DESCRIPTION
