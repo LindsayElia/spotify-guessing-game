@@ -123,9 +123,9 @@ $(function() {
 						var artistStringName = dataSpotify.track.artist[a].name;
 						// console.log(artistStringName, "getting artist name correctly?");
 						allCurrentArtists = allCurrentArtists.concat(artistStringName);
-						allCurrentArtists = allCurrentArtists.concat(", ");
+						allCurrentArtists = allCurrentArtists.concat(" ");
 					}
-					console.log(allCurrentArtists, "allCurrentArtists");
+					console.log("allCurrentArtists is: ", allCurrentArtists);
 					return allCurrentArtists;
 				} // close getAllArtistNames()
 				getAllArtistNames();
@@ -213,13 +213,18 @@ $(function() {
 		// check user's guess against song results
 		var guessAsIs = $userInputGuess.val();
 		var guessLowerCased = guessAsIs.toLowerCase();
-		console.log("guessLowerCased is " + guessLowerCased);
+		console.log("guessLowerCased is: " + guessLowerCased);
 
 /// add artist name for ALL artists
 		var answerArtist = allCurrentArtists;
+		console.log("answerArtist is: ", answerArtist);
 		var answerSong = dataSpotify.track.title;
-		var answer = answerArtist.toLowerCase() + " " + answerSong.toLowerCase();
-		console.log("var answer is " + answer);
+		console.log("answerSong is: ", answerSong);
+
+		// not sure how 'includes()' works, but adding a space before rest of string lets it work with the artist
+		// it wasn't identifying the first word in the string 'answer' but it was identifying the others
+		var answer = " " + answerArtist.toLowerCase() + answerSong.toLowerCase();
+		console.log("answer is: " + answer);
 
 		// NOTE - I tried using regular expressions with match() but it had to match the entire string??
 			// var regExp = new RegExp(answer);
@@ -235,8 +240,9 @@ $(function() {
 			// }
 
 		// when a user does not type anything or only types one character, return wrong answer
-		if (guessLowerCased <=1){
-			console.log("answer is incorrect");
+		if (guessLowerCased.length <= 2){	// I'm adding a space when I combine the artist & song title, 
+											// so that's at least 1 character, which is why this is 2
+			console.log("answer is incorrect; it is not long enough");
 			scoreIncorrect = scoreIncorrect + 1;
 			$numIncorrect.html("Incorrect: " + scoreIncorrect);
 		} 
