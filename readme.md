@@ -10,7 +10,7 @@ You can try out the application at [http://spotify-guessing-game.herokuapp.com/]
 
 #### Technologies used
 
-- Front end: JavaScript, HTML, CSS, jQuery
+- Front End: JavaScript, HTML, CSS, jQuery
 - Back End: NodeJS, ExpressJS, MongoDB, Mongoose, JavaScript
 
 #### API integrations
